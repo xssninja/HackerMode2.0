@@ -1,0 +1,7 @@
+The index.js file goes into the Alexa lambda function code. (more details to follow)
+
+The envrionment variables for your lambda function get set in AWS in the section "Environment Variables". (See the README.PNG image as an example) If you scroll down far enough you'll see it below the lambda code view. With a new project they will be empty and you'll need to add the named items being careful to keep them named exactly as they are depicted in the README.PNG otherwise the code will throw an error that will be hard to debug) 
+
+For the environment variables be sure to change the web servers to whatever your web server is that you're hosting your PHP code on, and reference MP3 audio files that you have cut to Alexa specifications. (some good articles out there on how to create Alexa friendly 60 second or less MP3 in the right format) Also pick a new secretcode (don't worry, I've changed mine) and perhaps most importantly, ensure that your Rick Roll audio is encoded in the proper MP3 format for Alexa, is short 60-90 seconds and that you don't copyright infringe. (So I hope your'e a good singer or know someone who can sing the tune or play it for your own audio cut) Or just replace it with something else.
+
+The package.json file shouldn't be needed if you are creating the skill from scratch... you should have your own package json
