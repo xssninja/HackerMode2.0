@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 def print_no_newline(string):
     #import sys
