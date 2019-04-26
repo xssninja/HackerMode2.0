@@ -21,9 +21,9 @@ This project was created for myself as a means for assisting me in my day to day
 USE YOUR AMAZON ACCOUNT FOR DEV AND TESTING
 One thing you should know before you proceed is that when you create an Alexa skill, it is not immediately published for the world, but is tied to your account. So USE YOUR ALEXA login, or whatever account you use to connect your Alexa as the account for the Alexa skill or your Alexa will never see the skill in her skill list.  By using the same login as you use for you Alexa account, you will automatically give any Alexa devices signed in with that same account access to the skill that you are building. For example: My family uses one account for our main Alexa (my Wife's account) and I use my Amazon account for Alexa skills development, Lambda development, and to connect my Tap and to connect my watch - so the Hacker Mode skill is automatically available on my devices but NOT on the family devices.
 
-=================
-What is Hacker Mode?        \  (the name of the project and the name to invoke the Alexa skill)
-===============================================================================================
+===========
+What is Hacker Mode?\  (the name of the project and the name to invoke the Alexa skill)
+========================================================================================
 
 Hacker Mode is a collection of Node.JS code and JSON that builds two important pieces of a whole:
 
