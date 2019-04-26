@@ -5,7 +5,7 @@
 // B) because Python supports synch and asynch web calls which is handy 
 // C) because Python rocks
 // D) because this was my second Alexa skill and I was in a hurry to get it coded up
-const APP_ID = "amzn1.ask.skill.becfcd54-dd71-43be-8db7-d1f262bff826"; // TODO replace with your app ID if customizing your own copy.
+const APP_ID = "amzn1.ask.skill.ffffff24-ff71-43fe-8ff7-d3f363bff222"; // TODO replace this sample app ID with your app ID.
 const Alexa = require('alexa-sdk');
 //const request = require('sync-request');
 //const awsSDK = require('aws-sdk');
@@ -13,7 +13,7 @@ const https = require('https');
 //var Data = require("./data");
 var crypto = require('crypto');
 
-// the following typically looks like: "exploit/osx/mdns/upnp_location" : "0", // but pymetasploit uses just the part after the exploit/
+// the following typically looks like: "exploit/osx/mdns/upnp_location" : "0", 
 const exploitports = { "EXPLOITPORTS_EN_US":{
 "osx/mdns/upnp_location" : "0",
 "windows/dcerpc/ms07_029_msdns_zonename" : "0",
