@@ -39,8 +39,8 @@ import unicodedata
 
 
 StopMeNow = False
-urlfromAlexa = 'https://xss.ninja/Kali_Read.php'
-urltoAlexa = 'https://xss.ninja/Kali2Alexa.php'
+urlfromAlexa = 'https://{domain and path where file is hosted}/Kali_Read.php'
+urltoAlexa = 'https://{domain and path where file is hosted}/Kali2Alexa.php'
 print ('urlfromAlexa is: ' + urlfromAlexa)
 print ('urltoAlexa is: ' + urltoAlexa)
 alexaAPIKey = ''
