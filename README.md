@@ -15,15 +15,17 @@ GOOD! You haven't been scared off yet. Keep reading if you dare...
 
 =================
 The origin story \
-======================================================================================================
+=======================================================================================
 This project was created for myself as a means for assisting me in my day to day work. I'm a full time red-team hacker and recently I was told by my doc that I would lose most of the sight in my left eye. It made me think, wow, it would probably be useful to build some general tools into Alexa so I don't have to have a Google window always open while I'm working... and Alexa works well for asking and answering quick questions. I went way beyond asking Alexa questions, but one does that when they're trying to take over the world.  Alexa is also handy for a little-known ability to send "card" data, or a little text version of what it answers for you which is nice for getting syntax detail that doesn't quite come across easily in speech. But I went far-far beyond just plain syntax help and encoding information and IP address lookups all the way to auto-scanning and auto-pwning.
 
 USE YOUR AMAZON ACCOUNT FOR DEV AND TESTING
 One thing you should know before you proceed is that when you create an Alexa skill, it is not immediately published for the world, but is tied to your account. So USE YOUR ALEXA login, or whatever account you use to connect your Alexa as the account for the Alexa skill or your Alexa will never see the skill in her skill list.  By using the same login as you use for you Alexa account, you will automatically give any Alexa devices signed in with that same account access to the skill that you are building. For example: My family uses one account for our main Alexa (my Wife's account) and I use my Amazon account for Alexa skills development, Lambda development, and to connect my Tap and to connect my watch - so the Hacker Mode skill is automatically available on my devices but NOT on the family devices.
 
-===========
-What is Hacker Mode?\  (the name of the project and the name to invoke the Alexa skill)
+===================
+What is Hacker Mode?\  
 ========================================================================================
+(the name of the project and the name to invoke the Alexa skill)
+
 
 Hacker Mode is a collection of Node.JS code and JSON that builds two important pieces of a whole:
 
@@ -48,12 +50,14 @@ Hacker Mode is a collection of Node.JS code and JSON that builds two important p
 3) The PHP files act as a basic queue when hosted on a PHP server. For ease of deployment you can host that on ec2 in AWS or you can host it on your own site. I anticipate it will be replace by a SNS queue within a few weeks.
 4) The Python service runs under python 2.7 like this: Python alexapwn.py
 
-====================
+
+==============================
+
 App Structure and First Steps \
-======================================================================================================
+========================================================================================
 I have broken out the files into Two directories to match the basic structure (Lambda and AlexaSkill)  The interesting thing is that these two pieces of an Alexa app are in fact created and tested IN TWO SEPARATE WEB SITES!  
 
-******************************************************************************************************
+********************************************************************************************
 You create your Alexa Skill in: https://developer.amazon.com/edw/home.html#/skill/
   Log in there create an Alexa function named HackerMode
   Enable the Beta Skill builder
@@ -69,10 +73,9 @@ And create your Lambda expression in: https://console.aws.amazon.com/lambda/home
 You have to make sure the ARN for the Lambda is entered into the Alexa Skill web site configuration for the skill portion.
 That will help the skill's invocation go to the right place at AWS.
 
-Once you have built your skill and connected it to the Lambda be sure to get the Alex app on your smart-phone, log into it, and under "my skills" add your newly minted skill. That enables it on your device or devices that exist under that account. (Again, note, the account apparently has to be the same as the account you use to log into Alexa and into your lambda and skills web sites. If not, your skill will exist but will not show up in the Alexa configuration app.) 
+Once you have built your skill and connected it to the Lambda be sure to get the Alex app on your smart-phone, log into it, and under "my skills" add your newly minted skill. That enables it on your device or devices that exist under that account. (Again, note, the account apparently has to be the same as the account you use to log into Alexa and into your lambda and skills web sites. If not, your skill will exist but will not show up in the Alexa configuration app.) DO NOT RELY ON THE Alexa Skill Simulator as it basically only works for some things and does not track a full session. It will basically help you test invocation but don't trust it to function like Alexa hardware or the Alexa app.
   
-These instructions may vary from day to day as they are constantly changing and adding things. There are some good YouTube videos on how to create and run a skill if you get stuck.
-
+Your PHP files will need to be hosted on a PHP server. As noted in the help file in that directory caution is needed to set it up more securely. You'll need to adjust both time zones and domain names in the PHP code. Follow the security measures mentioned in the readme.md in that PHP directory to help improve the security of the files. If you're not familiar with hosting web sites, and securing them, you may want to wait for the lambda queue implementation with authentication which should be available in the next quarter or so.
   
 *************************************************************************************************************
 I recommend before you start on your road to Alexa skill building that you use one of their built-in samples to get an idea of how it works. Bookmark both sites as you'll have them open a lot during development and you'll be cutting and pasting code into the sites. 
