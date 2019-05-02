@@ -17,7 +17,7 @@
 // B) because Python supports synch and asynch web calls which is handy 
 // C) because Python rocks
 // D) because this was my second Alexa skill and I was in a hurry to get it coded up
-const APP_ID = "amzn1.ask.skill.dd150dc5-6d00-418e-8e91-6e105a4c1fce"; // TODO replace with your app ID if customizing your own copy.
+const APP_ID = "amzn1.ask.skill.blah.blah.blah.blah"; // TODO replace with your app ID if customizing your own copy!
 const Alexa = require('alexa-sdk');
 //const request = require('sync-request');
 //const awsSDK = require('aws-sdk');
