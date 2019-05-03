@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "super hacker mode",
+            "invocationName": "crazy hacker mode",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -172,14 +172,6 @@
                     "name": "IPHackIntent",
                     "slots": [
                         {
-                            "name": "IPItemOne",
-                            "type": "AMAZON.NUMBER"
-                        },
-                        {
-                            "name": "IPItemTwo",
-                            "type": "AMAZON.NUMBER"
-                        },
-                        {
                             "name": "IPItemThree",
                             "type": "AMAZON.NUMBER"
                         },
@@ -189,16 +181,17 @@
                         }
                     ],
                     "samples": [
-                        "hack eye pee address address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hack i. p. address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hank i. p. address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hark i. p. address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hack IP {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hank eye pee address address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hack IP address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hack the IP address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "hack {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "pown IP address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}"
+                        "hark IP {IPItemThree} dot {IPItemFour}",
+                        "hack IP address address {IPItemThree} dot {IPItemFour}",
+                        "hack eye pee address {IPItemThree} dot {IPItemFour}",
+                        "hank IP address {IPItemThree} dot {IPItemFour}",
+                        "hark IP address {IPItemThree} dot {IPItemFour}",
+                        "hack IP {IPItemThree} dot {IPItemFour}",
+                        "hank eye pee address address {IPItemThree} dot {IPItemFour}",
+                        "hack IP address {IPItemThree} dot {IPItemFour}",
+                        "hack the IP {IPItemThree} dot {IPItemFour}",
+                        "hack {IPItemThree} dot {IPItemFour}",
+                        "pown IP address {IPItemThree} dot {IPItemFour}"
                     ]
                 },
                 {
@@ -617,6 +610,10 @@
                         "what can you tell me about the {WHItem} header",
                         "tell me about {WHItem} header"
                     ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
                 }
             ],
             "types": [
