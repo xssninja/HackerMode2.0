@@ -2,7 +2,7 @@ These files make a rudimentary queue in PHP. You'll need to drop it on a PHP ser
 
 Basic setup. These files installed on a PHP server will give you basic queue capability.
 1) But you need to modify places where it refers to timezone to match your time zone. 
-2) You'll need to change places where the code has {mydomain.com} to your domain like: www.example.com of course removing the {}. 
+2) You'll need to change places where the code has {mydomain.com} or _DIR_to your domain like: www.example.com of course removing the {}. 
 3) You'll want to keep the URLs private at the very least and consider adding authentication to the files, but in order to do that you'd need to modify the Python code for Kali and the Alexa Node code.
 4) You will want to change the .php filenames to something unique to you and mod the lines in the Python and the Lambda config to point to the right queue pages.
 5) You probably should even go so far as to change the filenames in code to where the queue data is saved. This way, nobody will infer the location of your requests.
