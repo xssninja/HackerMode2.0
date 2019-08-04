@@ -1,8 +1,14 @@
+For complete context-based help see the install documentation in the Install Instructions folder. 
+
 Prerequisites:
 Kali with Metasploit on it (should be default)
 Install nmap for python 2.7: pip install python-nmap
 (http://xael.org/norman/python/python-nmap/)
 
+You need pymetasploit installed
+pip install pymetasploit
+
+Then the fixed version:
 Install pymetasploit (from forked Miyaakson repo)
 git clone https://github.com/xssninja/pymetasploit
 Once you have the download change to the directory with setup.py and run this command line> python setup.py install
@@ -10,10 +16,13 @@ Once you have the download change to the directory with setup.py and run this co
 You also need the fixed msfrpcd library
 You should be able to install it using: python msfrpcd.py install
 
-Copy alexapwn.py to a directory of your choice. Just keep in mind you'll want it to be available.
+Copy alexapwn6.py and it's compiled config to the directory of your choice. Just keep in mind you'll want it to be available and probably in the path.
 
----A brief aside to talk about your PHP queue setup:---
-Open alexapwn.py and alter the variables that point to the URLs for the PHP queue file locations.
+---IMPORTANT:---
+Open alexapwn6cfg.py edit the URLs to point to the PHP queue file locations.  Then COMPILE IT when you're done! See instructions on page 39 of Installation Instructions for more details. In short, you can edit the file as needed then save it and compile with: 
+python -m py compile alexapwn6cfg.py
+Once in .pyc format it will be automatically imported by Alexapwn6.py when it runs.
+
 Keep in mind that whatever PHP server you run the Kali_Read.php and Kali2Alexa.php and AlexaRead.php
 and Alexa2Kali.php files from needs to have a publicly reachable IP or domain so that your Alexa can
 make calls from the cloud to reach it. Your Kali instance will also need to have external network access to
