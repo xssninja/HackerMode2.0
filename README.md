@@ -1,14 +1,7 @@
 # HackerMode2.0
-`(`-').->(`-')  _         <-.(`-') (`-')  _  (`-')     <-. (`-')           _(`-')   (`-')  _ `
-`(OO )__ (OO ).-/ _        __( OO) ( OO).-<-.(OO )        \(OO )_     .-> ( (OO ).->( OO).-/ `
-`,--. ,'-'/ ,---.  \-,-----'-'. ,--(,------,------,)    ,--./  ,-.(`-')----.\    .'_(,------. `
-`|  | |  || \ /`.\  |  .--.|  .'   /|  .---|   /`. '    |   `.'   ( OO).-.  '`'-..__)|  .---' `
-`|  `-'  |'-'|_.' |/_) (`-'|      /(|  '--.|  |_.' |    |  |'.'|  ( _) | |  |  |  ' (|  '--.  `
-`|  .-.  (|  .-.  |||  |OO |  .   ' |  .--'|  .   .'    |  |   |  |\|  |)|  |  |  / :|  .--'  `
-`|  | |  ||  | |  (_'  '--'|  |\   \|  `---|  |\  \     |  |   |  | '  '-'  |  '-'  /|  `---. `
-``--' `--'`--' `--'  `-----`--' '--'`------`--' '--'    `--'   `--'  `-----'`------' `------' `
 
-Voice auto pwn using Kali Linux and Alexa skill combo
+## Voice auto pwn using Kali Linux and Alexa skill combo
+(They need an ASCII Art markdown :+1: ) 
 
 WELCOME TO HACKER MODE 2 Death Star Version, the Amazon(tm) Alexa(tm) skill designed just for hackers by David Cross (and hopefully by you...)
 
@@ -22,9 +15,9 @@ To build on this project or reproduce it, you will need to create an Alexa Skill
 
 GOOD! You haven't been scared off yet. Keep reading if you dare...
 
-=================
-The origin story \
-===================
+
+## The origin story 
+
 This project was created for myself as a means for assisting me in my day to day work. I'm a full time red-team hacker and recently I was told by my doc that I would lose most of the sight in my left eye. It made me think, wow, it would probably be useful to build some general tools into Alexa so I don't have to have a Google window always open while I'm working... and Alexa works well for asking and answering quick questions. I went way beyond asking Alexa questions, but one does that when they're trying to take over the world.  Alexa is also handy for a little-known ability to send "card" data, or a little text version of what it answers for you which is nice for getting syntax detail that doesn't quite come across easily in speech. But I went far-far beyond just plain syntax help and encoding information and IP address lookups all the way to auto-scanning and auto-pwning.
 
 Would like to give a shout-out to James Blackburn. The only other human to spend about as much time on this as I have. Except he spends his time weeding through my releases and finding every single one of my issues and all the platform problems while reproducing, containerizing, tweaking and testing. I am in awe of his patience. Anyone else would have capped me by now. A shout out to Ali, Xander and CJ who have believed in me unwaveringly and put up with the long hours and muttered curses, (sometimes even not so muttered) of an obsessed family member. They are simply the best! And a shout out to Cate Jennison who has supported this project since it's first demo and is helping steer it to where it needs to go. And a shout-out to the AWS Alexa team and the support people who have tried to help improve the recognition and who hopefully delete my errant requests. (you can relax, the police aren't needed)
@@ -32,9 +25,9 @@ Would like to give a shout-out to James Blackburn. The only other human to spend
 USE YOUR AMAZON ACCOUNT FOR DEV AND TESTING
 One thing you should know before you proceed is that when you create an Alexa skill, it is not immediately published for the world, but is tied to your account. So USE YOUR ALEXA login, or whatever account you use to connect your Alexa as the account for the Alexa skill or your Alexa will never see the skill in her skill list.  By using the same login as you use for you Alexa account, you will automatically give any Alexa devices signed in with that same account access to the skill that you are building. For example: My family uses one account for our main Alexa (my Wife's account) and I use my Amazon account for Alexa skills development, Lambda development, and to connect my Tap and to connect my watch - so the Hacker Mode skill is automatically available on my devices but NOT on the family devices.
 
-===================
-What is Hacker Mode?\  
-=====================
+
+## What is Hacker Mode?
+
 (the name of the project and the name to invoke the Alexa skill)
 
 
@@ -62,10 +55,8 @@ Hacker Mode is a collection of Node.JS code and JSON that builds two important p
 4) The Python service runs under python 2.7 like this: Python alexapwn.py
 
 
-==============================
+## App Structure and First Steps 
 
-App Structure and First Steps \
-===============================
 I have broken out the files into Two directories to match the basic structure (Lambda and AlexaSkill)  The interesting thing is that these two pieces of an Alexa app are in fact created and tested IN TWO SEPARATE WEB SITES!  
 
 ****************************
@@ -91,9 +82,9 @@ Your PHP files will need to be hosted on a PHP server. As noted in the help file
 ******************
 I recommend before you start on your road to Alexa skill building that you use one of their built-in samples to get an idea of how it works. Bookmark both sites as you'll have them open a lot during development and you'll be cutting and pasting code into the sites. 
 
-================
-Getting Started \
-=================
+
+## Getting Started 
+
 Once you have your feet wet, and have tested a "demo" skill on your Alexa device... From there, you can create a new skill and preferably call it Hacker Mode and drop the lambda code in on the AWS side and link the two with AWS Lambda ARN number that is generated when you create the Lambda expression. This basically marries the Alexa skill in the skills web site to the logic in your Lambda expression on the AWS site.
 
 Amazon has some good tutorials and this is the one that I followed to create my skill on:
@@ -106,9 +97,9 @@ https://www.pluralsight.com/guides/node-js/amazon-alexa-skill-tutorial
 Follow the installation guidelines in the Installation documentation. This is a HARD build. You will need all the help you can get.
 Keep in mind that you will probably also need to look at the readme when installing the PHP queue as minor tweaks to timezone and URL are needed if the _DIR_ environment variable doesn't provide your site's domain.
 
-==============
-Further in Depth    \
-=====================
+
+## Further in Depth  
+
 
 The heart of the Lambda expression is basically a program inside of a JSON object. Which is weird but bear with me. (We live in a JavaScript world)  JSON, for those that aren't familiar is a basically a less wordy version of XML. And as such, it can hold data in various forms.
 
@@ -116,9 +107,10 @@ The goal of the Lambda expression is to provide a means of accessing your answer
 
 At the very bottom of the Lambda expression included in this project you'll notice a bunch of constants defined which determine the way JSON structures map to variables. The intent is not to make it more complicated, but rather to provide a means of mapping translations to the data structures into other languages. I gave up on that idea early on and hard coded the mappings. Eventually, when we get fancy, I want to separate out the JSON data definitions into separate files to make it easier to edit them. But for now I wanted to simplify the idea of what's happening and simplify the replacing of the Lambda expression with a simple copy and paste instead of uploading a structured zip file which is the only alternative.
 
-=======================
-What is Basically Done \
-========================
+
+## What is Basically Done
+
+
 Mostly done are: 
  NetCat
  NMAP
@@ -136,9 +128,9 @@ Mostly done are:
 
  Upgrading the intent code to support the new Beta skill builder capability
 
-======================
-What Needs to Be Done \ 
-========================
+
+## What Needs to Be Done  
+
 I want to finish:
  all TCP/UDP ports
  UU char encodes
@@ -169,9 +161,9 @@ When I think of where I want this to go, I want to get beyond just curiosity que
 
 YOU GET THE IDEA!!! SKYNET without the guns and robots BASICALLY...
 
-==============================
-How to Make that Happen        \
-=================================
+
+## How to Make that Happen    
+
 Of course you can't build into a Lambda function the logic to hack something and not end up in the slammer. Amazon is not stupid and they are not amused by people messing around with or in AWS! If you're going to be using this to launch pen-tests, do it from your machine where you have full responsibility for what happens. That doesn't mean you can't have a push out to a CNC server where you then pull down your voice requests onto your laptop and have your locally installed tools get busy on your network. (Yes, your network or a network where you have permissions to do scanning... again, without written permission to scan a network, you are just begging to go to jail.) 
 
 So, build out responsibly, use your own branch and your own hardware for SKYNET.  
@@ -182,9 +174,9 @@ If you submit code that requires a API call to another web site or web service f
 
 ... Speaking of which, Amazon lets you have a free Lambda requests up to about a million I believe... your account with them will keep you updated on the status of what is free at the time you are working on it.  So far for me, in development, my requests have only totaled in the hundreds.  But, I'm sure the same principle applies, something is free until it isn't... and keep an eye on how long your Lambda expressions are taking. I'm sure Amazon wouldn't like one that takes a long time to complete. They'd probably start eyeing that for the "isn't free" bucket sooner than later.
 
-==================
-About the License     \
-========================
+
+## About the License   
+
 GPL 3 is pretty restrictive, but this is a product I don't want being used to make money or enhance someone else's offering. This is a reasearch thing and you can use it for your own stuff, just don't blame me if you destroy something with it.
 
     HackerMode 2
