@@ -1,6 +1,6 @@
 <?php
 
-///////get date/time////////////////
+///////get date/time/////////CHANGE YOUR TIME ZONE///////
 date_default_timezone_set('America/Denver');
 $date = date('m/d/Y h:i:s a', time());
 ////////////////////////////
@@ -13,6 +13,15 @@ $cmd = $_POST['cmd'];
 //$ip = $_POST['ip'];
 $sig = $_POST['sig']; // sig should be in the Json
 //$fixedip = str_replace("-",".",$ip);
+
+// new remove suspect characters
+$cmd = str_replace("<","",$cmd);
+//$cmd = str_replace("data:","data.",$cmd);
+$cmd = str_replace("?>","",$cmd);
+$cmd = str_replace("(","",$cmd);
+$cmd = str_replace(")","",$cmd);
+$cmd = str_replace("//","",$cmd);
+$cmd = "HackerModeQueueData:" . $cmd;
 
 // create a small CSV
 $alexa_req = $cmd . "|sig=" . $sig;
