@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "crazy hacker mode",
+            "invocationName": "hacker mode",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -36,9 +36,17 @@
                         "what is the ASCII encoding for {CHARItem}",
                         "what is an ASCII encoding for {CHARItem}",
                         "what is an ASCII encoding for a {CHARItem}",
-                        "how is {CHARItem} ASCII encoded",
                         "ASCII encoding for {CHARItem}",
                         "ASCII for {CHARItem}"
+                    ]
+                },
+                {
+                    "name": "ClearSessionData",
+                    "slots": [],
+                    "samples": [
+                        "clear session data",
+                        "clear session",
+                        "clear data"
                     ]
                 },
                 {
@@ -52,12 +60,6 @@
                     "samples": [
                         "how do I Hex encode {CHARItem}",
                         "how do I Hex encode a {CHARItem}",
-                        "tell me the Hex encoding for a {CHARItem}",
-                        "tell me the Hex encoding for {CHARItem}",
-                        "tell me the Hex encoding for the {CHARItem}",
-                        "give me the Hex encoding for a {CHARItem}",
-                        "give me the Hex encoding for {CHARItem}",
-                        "give me the Hex encoding for the {CHARItem}",
                         "what is the Hex encoding for a {CHARItem}",
                         "what is the Hex encoding for {CHARItem}",
                         "what is the Hex encoding for the {CHARItem}",
@@ -65,10 +67,6 @@
                         "how is {CHARItem} Hex encoded",
                         "Hex encoding for {CHARItem}",
                         "Hex for {CHARItem}",
-                        "how do you hex encode for a {CHARItem}",
-                        "how do you hex encode for {CHARItem}",
-                        "how do you hex encode for the {CHARItem}",
-                        "how do you hex encode the {CHARItem}",
                         "how do you hex encode {CHARItem}"
                     ]
                 },
@@ -85,15 +83,25 @@
                         "how do you HTML encode {CHARItem}",
                         "how do I HTML encode {CHARItem}",
                         "how do I HTML encode a {CHARItem}",
-                        "what is the HTML encoding for a {CHARItem}",
                         "what is the HTML encoding for {CHARItem}",
                         "what is the HTML encoding for the {CHARItem}",
                         "what is an HTML encoding for {CHARItem}",
-                        "what is an HTML encoding for a {CHARItem}",
-                        "how is {CHARItem} HTML encoded",
                         "HTML encoding for {CHARItem}",
                         "HTML for {CHARItem}",
                         "what is the HTML for {CHARItem}"
+                    ]
+                },
+                {
+                    "name": "KnownPortsIntent",
+                    "slots": [
+                        {
+                            "name": "NUMItem",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "what runs on port {NUMItem}",
+                        "what service runs on port {NUMItem}"
                     ]
                 },
                 {
@@ -121,18 +129,10 @@
                         }
                     ],
                     "samples": [
-                        "what are {HVItem} verbs",
                         "what does the HTTP verb {HVItem} do",
                         "what is the http verb {HVItem}",
-                        "list {HVItem} verbs",
-                        "list {HVItem} http verbs",
-                        "what is the {HVItem} verb",
-                        "tell me about the {HVItem} verb",
                         "what does the {HVItem} verb do",
-                        "what are {HVItem} HTTP verbs",
-                        "list {HVItem} HTTP verbs",
                         "what is the {HVItem} HTTP verb",
-                        "tell me about the {HVItem} HTTP verb",
                         "what does the {HVItem} HTTP verb do"
                     ]
                 },
@@ -159,13 +159,7 @@
                     "samples": [
                         "look up IP {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
                         "look up IP address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "IP look up IP address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "IP look up IP {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "IP look up {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}",
-                        "do an IP address lookup on {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour} ",
-                        "do an IP lookup on {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour} ",
-                        "do a IP lookup on {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour} ",
-                        "do a IP lookup for {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour} "
+                        "look up eye pee address {IPItemOne} dot {IPItemTwo} dot {IPItemThree} dot {IPItemFour}"
                     ]
                 },
                 {
@@ -232,11 +226,11 @@
                         }
                     ],
                     "samples": [
-                        "get exploit",
-                        "what is the current exploit",
-                        "what exploit is set",
-                        "get exploit name",
-                        "which exploit is set"
+                        "set exploit {ExploitName}",
+                        "what is the current exploit {ExploitName}",
+                        "what exploit is set {ExploitName}",
+                        "get exploit name {ExploitName}",
+                        "which exploit is set {ExploitName}"
                     ]
                 },
                 {
@@ -298,9 +292,9 @@
                         }
                     ],
                     "samples": [
-                        "set remote port",
-                        "set the remote port",
-                        "set the remote port to"
+                        "set remote port {RPort}",
+                        "set the remote port {RPort}",
+                        "set the remote port to {RPort}"
                     ]
                 },
                 {
@@ -312,9 +306,9 @@
                         }
                     ],
                     "samples": [
-                        "set local port",
-                        "set the local port",
-                        "set the local port to"
+                        "set local port {LPort}",
+                        "set the local port {LPort}",
+                        "set the local port to {LPort}"
                     ]
                 },
                 {
@@ -349,6 +343,7 @@
                         "get r port",
                         "get the r port",
                         "what is the r port",
+                        "what is the r port set to",
                         "what r port is set",
                         "get remote port",
                         "get the remote port",
@@ -384,13 +379,11 @@
                     "name": "ReadCommandFromKali",
                     "slots": [],
                     "samples": [
-                        "read command from Kali",
                         "how is the hack going",
                         "what is the status of the hack",
                         "what's the status of the hack",
                         "status of the hack",
                         "is there progress on the hack",
-                        "what progress have you made on the hack",
                         "what progress on the hack",
                         "hows the hack going",
                         "what's happening on the hack",
@@ -556,6 +549,194 @@
                     ]
                 },
                 {
+                    "name": "MetasploitIntent",
+                    "slots": [
+                        {
+                            "name": "MSFItem",
+                            "type": "LIST_OF_MSFITEMS"
+                        }
+                    ],
+                    "samples": [
+                        "how do you {MSFItem} in meta sploit",
+                        "how do you {MSFItem} meta sploit",
+                        "how do you {MSFItem} with meta sploit",
+                        "how do you do {MSFItem} in meta sploit",
+                        "how do you do {MSFItem} meta sploit",
+                        "how do you do {MSFItem} with meta sploit",
+                        "how do you use {MSFItem} in meta sploit",
+                        "how do I {MSFItem} in meta sploit",
+                        "how do I {MSFItem} with meta sploit",
+                        "how do I do {MSFItem} in meta sploit",
+                        "how do I do {MSFItem} with meta sploit",
+                        "how do I do an {MSFItem} in meta sploit",
+                        "how do I {MSFItem} meta sploit",
+                        "how do I use {MSFItem} in meta sploit",
+                        "how would I do a {MSFItem} in meta sploit",
+                        "how would I do a {MSFItem} with meta sploit",
+                        "how would I {MSFItem} in meta sploit",
+                        "how would I {MSFItem} meta sploit",
+                        "how would I {MSFItem} with meta sploit",
+                        "tell me how to {MSFItem} in meta sploit",
+                        "tell me how to {MSFItem} using meta sploit",
+                        "tell me how to {MSFItem} with meta sploit",
+                        "how can I {MSFItem} in meta sploit",
+                        "how can I {MSFItem} with meta sploit",
+                        "what is the syntax for {MSFItem} in meta sploit",
+                        "what is the way to {MSFItem} in meta sploit",
+                        "in meta sploit how do I {MSFItem}",
+                        "in meta sploit how can I {MSFItem}",
+                        "in meta sploit how would I {MSFItem}",
+                        "in meta sploit what does the command {MSFItem} do",
+                        "in meta sploit what does the command line {MSFItem} do",
+                        "in meta sploit what is the command {MSFItem}",
+                        "in meta sploit what is the command {MSFItem} for",
+                        "in meta sploit what is the command for {MSFItem}",
+                        "in meta sploit what is the command line for {MSFItem}",
+                        "in meta sploit what is the syntax for {MSFItem}",
+                        "what is the command for {MSFItem} in meta sploit",
+                        "what is the meta sploit command for {MSFItem}",
+                        "what is the meta sploit command line for {MSFItem}",
+                        "what is the meta sploit syntax for {MSFItem}",
+                        "what is the meta sploit console command for {MSFItem}",
+                        "what is the meta sploit console syntax for {MSFItem}"
+                    ]
+                },
+                {
+                    "name": "NetcatIntent",
+                    "slots": [
+                        {
+                            "name": "NCItem",
+                            "type": "LIST_OF_NCITEMS"
+                        }
+                    ],
+                    "samples": [
+                        "how do you set up a {NCItem} with net cat",
+                        "how do you do a net cat {NCItem}",
+                        "how do you do a {NCItem} in net cat",
+                        "how do you do a {NCItem} using net cat",
+                        "how do you set up a net cat {NCItem}",
+                        "how do you set up a {NCItem} in net cat",
+                        "how do you set up a {NCItem} using net cat",
+                        "how can I set up a {NCItem} with net cat",
+                        "how can I set up a net cat {NCItem}",
+                        "how can I set up a {NCItem} in net cat",
+                        "how can I set up a {NCItem} using net cat",
+                        "what is the syntax for a {NCItem} with net cat",
+                        "what is the syntax for a net cat {NCItem}",
+                        "what is the syntax for {NCItem} in net cat",
+                        "what is the syntax for setting up a {NCItem} in net cat",
+                        "what is the syntax for a {NCItem} using net cat",
+                        "what is the command for a {NCItem} with net cat",
+                        "what is the command for a net cat {NCItem}",
+                        "what is the command for {NCItem} in net cat",
+                        "what is the command for setting up a {NCItem} in net cat",
+                        "what is the command for a {NCItem} using net cat",
+                        "what is the net cat command for a {NCItem} with net cat",
+                        "what is the net cat command for a {NCItem}",
+                        "what is the net cat command line for a {NCItem}",
+                        "what is the net cat command line for {NCItem}",
+                        "what is the net cat command for {NCItem}",
+                        "what is the net cat command for setting up a {NCItem}",
+                        "set up a {NCItem} with net cat",
+                        "set up a net cat {NCItem}",
+                        "set up a {NCItem} in net cat",
+                        "set up a {NCItem} using net cat",
+                        "tell me how I can set up a {NCItem} with net cat",
+                        "tell me how I can set up a net cat {NCItem}",
+                        "tell me how I can set up a {NCItem} in net cat",
+                        "tell me how to set up a {NCItem} with net cat",
+                        "tell me how to set up a net cat {NCItem}",
+                        "tell me how to set up a {NCItem} in net cat",
+                        "how would I set up a {NCItem} with net cat",
+                        "how would I set up a net cat {NCItem}",
+                        "how would I set up a {NCItem} in net cat",
+                        "how would I do up a {NCItem} with net cat",
+                        "how would I do up a net cat {NCItem}",
+                        "how would I do up a {NCItem} in net cat",
+                        "in net cat how do I {NCItem}",
+                        "in net cat how can I {NCItem}",
+                        "in net cat what is the command for {NCItem}",
+                        "in net cat what is the command line for {NCItem}",
+                        "in net cat how do I do a {NCItem}",
+                        "tell me how to do a {NCItem} with net cat",
+                        "tell me how to do a {NCItem} using net cat",
+                        "how can I do a {NCItem} with net cat",
+                        "how can I do {NCItem} with net cat",
+                        "how do I do a {NCItem} with net cat"
+                    ]
+                },
+                {
+                    "name": "NmapIntent",
+                    "slots": [
+                        {
+                            "name": "NMItem",
+                            "type": "LIST_OF_NMITEMS"
+                        }
+                    ],
+                    "samples": [
+                        "how do you scan {NMItem}",
+                        "how do you scan for {NMItem}",
+                        "how do you set up a {NMItem} scan",
+                        "how do you set up a {NMItem} n-map scan",
+                        "what is the syntax for a {NMItem} scan with n-map",
+                        "what is the syntax for a {NMItem} scan",
+                        "what is the syntax for a {NMItem} n-map scan",
+                        "what is the syntax for {NMItem} with n-map",
+                        "what is the syntax for doing {NMItem} with n-map",
+                        "what is the syntax for a {NMItem} with n-map",
+                        "what is the syntax for {NMItem} using n-map",
+                        "what is the command for a {NMItem} scan",
+                        "what is the command for a {NMItem} n-map scan",
+                        "what is the command for a {NMItem} with n-map",
+                        "what is the command for {NMItem} with n-map",
+                        "what is the command for {NMItem} using n-map",
+                        "what is the n-map command for a {NMItem} scan",
+                        "what is the n-map command for a {NMItem}",
+                        "what is the n-map command for {NMItem}",
+                        "what is the n-map command for doing a {NMItem}",
+                        "what is the n-map command for scan {NMItem}",
+                        "what is the n-map command for scanning {NMItem}",
+                        "what is the command for a {NMItem} scan with n-map",
+                        "what is the command line for a {NMItem} n-map scan",
+                        "what is the command line for a {NMItem} with n-map",
+                        "what is the command line for a {NMItem} using n-map",
+                        "what is the command line for a {NMItem} scan with n-map",
+                        "how do I scan {NMItem} with n-map",
+                        "how do I {NMItem} with n-map",
+                        "how do I {NMItem} using n-map",
+                        "how do i do an {NMItem} scan with n-map",
+                        "how do i do an {NMItem} with n-map",
+                        "how do I do a {NMItem} scan with n-map",
+                        "how do I do a {NMItem} with n-map",
+                        "how can I {NMItem} with n-map",
+                        "how can I do a {NMItem} scan",
+                        "how can I do a {NMItem} n-map scan",
+                        "how can I do a {NMItem} scan with n-map",
+                        "how do you do a {NMItem} scan",
+                        "how do you do a {NMItem} n-map scan",
+                        "how do you do a {NMItem} scan with n-map",
+                        "how can I set up a {NMItem} scan",
+                        "how can I set up a {NMItem} n-map scan",
+                        "how can I set up a {NMItem} scan with n-map",
+                        "how would I do a {NMItem} scan",
+                        "how would I do a {NMItem} n-map scan",
+                        "how would I do a {NMItem} scan with n-map scan",
+                        "how would I scan {NMItem} with n-map",
+                        "in n-map how would I do a {NMItem} scan",
+                        "in n-map how would I do a {NMItem}",
+                        "in n-map how can I do a {NMItem} scan",
+                        "in n-map how do I do a {NMItem} scan",
+                        "with n-map how do I scan {NMItem}",
+                        "with n-map how can I scan {NMItem}",
+                        "in n-map how do I {NMItem}",
+                        "using n-map how do I {NMItem}",
+                        "using n-map how do I scan {NMItem}",
+                        "in n-map how do I scan {NMItem}",
+                        "in n-map how would I {NMItem}",
+                        "with n-map how do I {NMItem}"
+                    ]
+                },
+                {
                     "name": "URLEncodingIntent",
                     "slots": [
                         {
@@ -564,12 +745,6 @@
                         }
                     ],
                     "samples": [
-                        "how can I URL encode {CHARItem}",
-                        "how do I URL encode {CHARItem}",
-                        "how do I URL encode a {CHARItem}",
-                        "how do you URL encode {CHARItem}",
-                        "how do you URL encode the {CHARItem}",
-                        "how do you URL encode a {CHARItem}",
                         "what is the URL encoding for {CHARItem}",
                         "what is the URL encoding for a {CHARItem}",
                         "what is the URL encoding for the {CHARItem}",
