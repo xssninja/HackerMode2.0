@@ -7,7 +7,7 @@ WELCOME TO HACKER MODE 2 Death Star Version, the Amazon(tm) Alexa(tm) skill desi
 
 I hope you will join in being one of the creators that helps Hacker Mode 2 take over the world and hack it at the same time...
 
-THIS PROJECT CREATES AN AMAZON ALEXA SKILL APP. So you can say "Alexa, hacker mode" and then ask a series of questions about encodings, or command line help for programs like Metasploit(tm), Nmap, NetCat. Like: "How do you do a services fingerprint scan with Nmap?" Or "What is the HTML encoding for double-quote?" etc. 
+THIS PROJECT CREATES AN AMAZON ALEXA SKILL APP. So you can say "Alexa, start hacker mode" and then ask a series of questions about encodings, or command line help for programs like Metasploit(tm), Nmap, NetCat. Like: "How do you do a services fingerprint scan with Nmap?" Or "What is the HTML encoding for double-quote?" etc. 
 
 You can also ask: "Hack IP address 1.220" (the IP prefix is implied based on where your Kali linux instance lives. The skill will scan 1.220 on the subnet local to your Kali instance.
 
