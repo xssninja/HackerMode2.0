@@ -9,11 +9,14 @@ Basic setup. These files installed on a PHP server will give you basic queue cap
 6) Add headers to the PHP files so there is less chance of the temp files being interpreted as code (nosniff) etc.
 7) You can add headers using HTACCESS for better coverage as noted below but it has dependencies and you'll need to test it
 Each web server will have some equivalent to this blanket application of headers method. (Google is your friend)
+8) Be mindful of the case on the Mp3 directory. I should have set the dir to lowercase but it made it through as initial caps. Always be mindful of case sensitivity on some OS systems versus others. It may require special care on the lambda config side. (see the installation instructions diretory for more detailed info)
 
+Header Info:
 If hosting on Apache you should have mod_headers enabled and add the following block of headers to your .htaccess file (don't include the ----- snip ----- lines)
 Note, that adding the SAMEORIGIN frame header will break most iframing schemes so if you are crazy and want people to iframe your stuff from another domain, then by all means you're welcome to take that one out. But with any change to web server config file work, save your original just in case testing shows you're broken.
 
 Again: below is a snip from a .HTACCESS file for Apache designed to take effect if mod_headers is installed.
+
 ----- snip ------
 <IfModule mod_headers.c>
 	Header set X-XSS-Protection "1; mode=block"
