@@ -7,6 +7,7 @@
 |  .-.  (|  .-.  |||  |OO |  .   ' |  .--'|  .   .'    |  |   |  |\|  |)|  |  |  / :|  .--'  
 |  | |  ||  | |  (_'  '--'|  |\   \|  `---|  |\  \     |  |   |  | '  '-'  |  '-'  /|  `---. 
 `--' `--'`--' `--'  `-----`--' '--'`------`--' '--'    `--'   `--'  `-----'`------' `------' 
+
 Voice auto pwn using Kali Linux and Alexa skill combo
 
 WELCOME TO HACKER MODE 2 Death Star Version, the Amazon(tm) Alexa(tm) skill designed just for hackers by David Cross (and hopefully by you...)
