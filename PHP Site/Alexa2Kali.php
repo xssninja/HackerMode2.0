@@ -29,14 +29,14 @@ $scan_req = $cmd . "|sig=" . $sig;
 //print($req_dump);
 
 // write to a file containing the current scan IP and sinature
-$fp = fopen('4KaliQueue___.txt','w');
+$fp = fopen('4KaliQueue.txt','w');
 fwrite($fp, $scan_req);
 fclose($fp);
 
 // write to a log of all the scan requests that have been receieved over time
 $user_ip = getUserIP();
 $req_dump = "\n". $date . " Alexa asks Kali " . $scan_req;
-$fpp = fopen('allscanIPrequests___.log', 'a');
+$fpp = fopen('allscanIPrequests.log', 'a');
 fwrite($fpp, $req_dump);
 fclose($fpp);
 
