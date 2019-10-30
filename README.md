@@ -14,7 +14,8 @@ You can also ask: "Hack IP address 1.220" (the IP prefix is implied based on whe
 To build on this project or reproduce it, you will need to create an Alexa Skills developer account to put the skill invocation examples JSON, and a AWS account for the program logic in the form of a NodeJS app encapsulated in JSON for Lambda. And of course, you'd need to have a Tap, Dot, Echo or CoWatch watch or Alexa phone app, or browser that is currently logged into the Alexa Skills developer interface. The links will be provided below for the Amazon sites.
 
 GOOD! You haven't been scared off yet. Keep reading if you dare...
-
+#*** IMPORTANT NOTE *** 
+Amazon has retired the SDK this project was built on and the compatability layer has failed in my conversion project. I will have to do a moderate rewrite to Node10 with the latest ASK-SDK or rewrite it in Python 3. I'm leaning toward Python in an effort to keep language scope down and also reduce the speed of rewriting code as a version of Node seems to be retired each year. If you email me I will foward you the zip file with the original Node6 packages for the back-end which should still run if you import it directly into your lambda editor.
 
 ## The origin story 
 
