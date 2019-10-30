@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "hacker mode",
+            "invocationName": "hack box",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -211,7 +211,6 @@
                     ],
                     "samples": [
                         "use exploit {ExploitName}",
-                        "set exploit {ExploitName}",
                         "set exploit to {ExploitName}",
                         "exploit using {ExploitName}",
                         "exploit with {ExploitName}"
